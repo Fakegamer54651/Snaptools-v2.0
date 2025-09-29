@@ -1,0 +1,21 @@
+/* SnapTools v2 Extension - Content Script Styles */
+
+/* Import Poppins font for any injected elements */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
+/* Namespace all extension styles to avoid conflicts */
+.st-ext-element {
+  font-family: 'Poppins', sans-serif !important;
+  box-sizing: border-box !important;
+}
+
+/* Placeholder styles for future content script UI elements */
+.st-ext-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 999999;
+  pointer-events: none;
+}

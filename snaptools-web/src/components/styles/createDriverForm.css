@@ -1,0 +1,58 @@
+.create-driver-form {
+  width: 100%;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+}
+
+.form-row-three {
+  /* 3 fields in one row: Call sign, Driver name, Phone # */
+}
+
+.form-row-two {
+  /* 2 fields in one row: Truck #, Trailer # */
+}
+
+.form-row-one {
+  /* 1 field in one row: VIN # */
+}
+
+.form-group {
+  flex: 1;
+}
+
+/* Input styling is now handled by the Input component */
+
+/* Phone styling removed - now handled by Input component */
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding-top: 24px;
+}
+
+/* Button styles are now handled by the Button component */
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .form-row {
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+  }
+}

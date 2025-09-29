@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "SnapTools v2 Extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for SnapTools v2",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "SnapTools v2"
+  },
+  "background": {
+    "service_worker": "src/background/index.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/index.js"],
+      "css": ["src/content/inject.css"]
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/content/inject.css"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

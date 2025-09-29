@@ -1,0 +1,130 @@
+/* Figma Chip Component Styles */
+.figma-chip {
+  /* Container */
+  background: #fff;
+  border-radius: 16px;
+  padding: 12px;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.08);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+  isolation: isolate; /* Create stacking context for glows */
+}
+
+/* Decorative Glow Container */
+.figma-chip__glow-container {
+  position: absolute;
+  left: 12px; /* Match container padding */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Decorative Glow Circles */
+.figma-chip__glow {
+  position: absolute;
+  width: 27.49px;
+  height: 27.49px;
+  border-radius: 130px;
+  filter: blur(14.39px);
+  opacity: 0.8;
+}
+
+.figma-chip__glow--1 {
+  top: 2px;
+  left: 2px;
+  filter: blur(14.39px) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.figma-chip__glow--2 {
+  top: 6px;
+  left: 8px;
+  filter: blur(14.39px) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.figma-chip__glow--3 {
+  top: 10px;
+  left: 14px;
+  filter: blur(14.39px) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Icon Holder */
+.figma-chip__icon-holder {
+  width: 44px;
+  height: 44px;
+  background: #fff;
+  border-radius: 999px;
+  box-shadow: 1px 1px 6px rgba(0, 0, 0, 0.14);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+/* Text Content */
+.figma-chip__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  text-align: left;
+  z-index: 1;
+  position: relative;
+}
+
+.figma-chip__subtitle {
+  color: #707070;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16.8px;
+  letter-spacing: 0.12px;
+  margin: 0;
+}
+
+.figma-chip__message {
+  color: #030712;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+  letter-spacing: 0.14px;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .figma-chip {
+    padding: 10px;
+    gap: 6px;
+  }
+  
+  .figma-chip__glow-container {
+    left: 10px;
+  }
+  
+  .figma-chip__icon-holder {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .figma-chip__icon-holder svg {
+    width: 18px;
+    height: 18px;
+  }
+  
+  .figma-chip__subtitle {
+    font-size: 11px;
+    line-height: 15.4px;
+  }
+  
+  .figma-chip__message {
+    font-size: 13px;
+    line-height: 18.2px;
+  }
+}

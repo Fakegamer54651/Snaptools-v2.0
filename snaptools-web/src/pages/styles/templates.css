@@ -1,0 +1,65 @@
+/* Основная страница шаблонов */
+.templates-page {
+  padding: 0;
+  width: 100%;
+  position: relative;
+}
+
+/* Заголовок страницы */
+.templates-header {
+  margin-bottom: 24px;
+  padding-left: 20px;
+  padding-top: 16px;
+}
+
+.templates-header h1 {
+  color: var(--Primary-text, #0A0A0A);
+  font-size: 20px;
+  font-family: Poppins;
+  font-weight: 700;
+  line-height: 24px;
+  word-wrap: break-word;
+  margin: 0;
+}
+
+/* Основной контент страницы */
+.templates-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 0 20px 20px 20px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Секция таблицы шаблонов */
+.templates-table-section {
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+  width: 100%;
+}
+
+/* Контейнер кнопки создания шаблона */
+.add-template-btn-container {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  z-index: 10;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .templates-content {
+    padding: 0 16px 16px 16px;
+  }
+  
+  .templates-header {
+    padding-left: 16px;
+  }
+  
+  .add-template-btn-container {
+    right: 16px;
+  }
+}

@@ -1,0 +1,179 @@
+.table-container {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid #e4e4e4;
+  background-color: white;
+  width: 100%;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.table-header {
+  background-color: #F1F1F1;
+  border-top: 1px solid #E5E7EB;
+}
+
+.table-header tr {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 12px 10px 12px 12px;
+  overflow: hidden;
+}
+
+.table-header-cell {
+  padding: 0;
+  text-align: left;
+  font-weight: 400;
+  color: #727179;
+  font-size: 12px;
+  font-family: Poppins;
+  line-height: 20px;
+  word-wrap: break-word;
+  border: none;
+}
+
+.table-header-cell:nth-child(1) { /* Call sign */
+  width: 120px;
+}
+
+.table-header-cell:nth-child(2) { /* Driver name */
+  width: 224px;
+}
+
+.table-header-cell:nth-child(3) { /* Phone# */
+  width: 148px;
+}
+
+.table-header-cell:nth-child(4) { /* Truck# */
+  width: 112px;
+}
+
+.table-header-cell:nth-child(5) { /* Trailer# */
+  width: 112px;
+}
+
+.table-header-cell:nth-child(6) { /* VIN# */
+  flex: 1 1 0;
+}
+
+.table-header-cell:nth-child(7) { /* Actions */
+  width: 88px;
+}
+
+.table-body {
+  background-color: white;
+}
+
+.table-row {
+  border-top: 1px solid #E5E7EB;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 8px 10px 8px 12px;
+  overflow: hidden;
+}
+
+.table-row:hover {
+  background-color: #f9fafb;
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  padding: 0;
+  color: #252525;
+  font-size: 14px;
+  font-family: Poppins;
+  font-weight: 400;
+  line-height: 24px;
+  word-wrap: break-word;
+  border: none;
+}
+
+.table-cell:nth-child(1) { /* Call sign */
+  width: 120px;
+}
+
+.table-cell:nth-child(2) { /* Driver name */
+  width: 224px;
+}
+
+.table-cell:nth-child(3) { /* Phone# */
+  width: 148px;
+}
+
+.table-cell:nth-child(4) { /* Truck# */
+  width: 112px;
+}
+
+.table-cell:nth-child(5) { /* Trailer# */
+  width: 112px;
+}
+
+.table-cell:nth-child(6) { /* VIN# */
+  flex: 1 1 0;
+}
+
+.table-cell:nth-child(7) { /* Actions */
+  width: 88px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.action-button {
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.action-button.edit {
+  background-color: transparent;
+}
+
+.action-button.delete {
+  background-color: transparent;
+}
+
+.action-button.edit:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.action-button.delete:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.action-button .material-symbols-rounded {
+  font-size: 20px;
+  color: #0A0A0A;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .table-container {
+    font-size: 12px;
+  }
+  
+  .table-header-cell,
+  .table-cell {
+    padding: 8px 12px;
+  }
+}

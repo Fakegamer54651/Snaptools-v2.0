@@ -1,0 +1,92 @@
+/* Splash Screen Styles */
+.splash-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: splashFadeOut 500ms ease-in-out 1.5s forwards;
+}
+
+.splash-screen__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.splash-screen__logo {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 250px;
+  height: auto;
+  animation: logoFadeInFromBottom 600ms ease-out forwards;
+}
+
+.splash-screen__logo-image {
+  width: 250px;
+  height: auto;
+  display: block;
+  position: relative;
+}
+
+
+/* Animations */
+@keyframes splashFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+@keyframes logoFadeInFromBottom {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade out class for manual control */
+.splash-screen--fade-out {
+  animation: splashFadeOut 0.5s ease-in-out forwards;
+}
+
+.splash-screen--fade-out .splash-screen__logo {
+  animation: logoFadeOutToTop 0.5s ease-in-out forwards;
+}
+
+@keyframes logoFadeOutToTop {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .splash-screen__logo {
+    width: 200px;
+  }
+  
+  .splash-screen__logo-image {
+    width: 200px;
+  }
+}

@@ -1,0 +1,683 @@
+/* Create Template Page - New Design - Cache Bust v2.1 */
+.create-template-page {
+  min-height: 100vh;
+  background: #FFFDFB;
+  padding: 0;
+  font-family: 'Poppins', sans-serif;
+  position: relative;
+}
+
+/* Back Button */
+.back-button-container {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  padding: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.back-icon-placeholder {
+  display: none; /* Completely hidden */
+}
+
+.back-arrow {
+  width: 12.98px;
+  height: 12.64px;
+  color: #0A0A0A;
+  font-size: 16px;
+}
+
+.back-text {
+  color: var(--Primary-text, #0A0A0A);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* Main Content Layout */
+.create-template-content {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  max-width: 1200px;
+  padding: 72px 20px 20px 12px; /* 72px from top to clear back button, 12px from left */
+}
+
+/* Main Form Container */
+.main-form-container {
+  width: 600px;
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  border: 1px solid #E4E4E4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
+}
+
+/* Form Styling */
+.create-template-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Form Fields */
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-label {
+  color: var(--Primary-text, #0A0A0A);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  line-height: 14px;
+  word-wrap: break-word;
+}
+
+.form-input {
+  height: 36px;
+  padding: 8px 13px;
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: white;
+  color: var(--Primary-text, #0A0A0A);
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  transition: all 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: #838383;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1976d2;
+  box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+}
+
+/* Prevent any visual feedback for disallowed drag over */
+.form-input:not(.drop-zone) {
+  /* No special styling for non-drop-zone inputs */
+}
+
+.form-input:not(.drop-zone):hover {
+  /* Maintain normal hover behavior */
+  border-color: #D1D5DB;
+}
+
+/* Email Editor Field */
+.email-editor-field {
+  position: relative;
+}
+
+.rich-email-container {
+  position: relative;
+}
+
+.rich-email-container.drop-zone {
+  /* Only show drag feedback when actually dragging */
+}
+
+.rich-email-container.drop-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 1;
+  opacity: 0;
+}
+
+/* Only show orange border when actually dragging over (not on regular hover) */
+.rich-email-container.drop-zone.drag-over::after {
+  border-color: #FF6B00;
+  background-color: rgba(255, 107, 0, 0.05);
+  opacity: 1;
+}
+
+.email-editor-field .form-label {
+  color: #384252;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  line-height: 14px;
+}
+
+/* Rich Text Editor Container */
+.rich-text-editor-container {
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.rich-text-editor-container .rich-text-editor {
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #D1D5DB;
+}
+
+.rich-text-editor-container .rich-text-editor__editor {
+  min-height: 200px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--Primary-text, #0A0A0A);
+}
+
+/* Form Actions */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 24px; /* Reduced spacing, no divider */
+}
+
+.save-button {
+  background: var(--Primary-Brand, #252525) !important;
+  color: white !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 400 !important;
+  line-height: 24px !important;
+}
+
+.preview-button {
+  background: #EBEBEB !important;
+  color: var(--Primary-text, #0A0A0A) !important;
+  height: 40px !important;
+  border-radius: 8px !important;
+  font-size: 14px !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  line-height: 24px !important;
+}
+
+/* Sidebar Container */
+.sidebar-container {
+  width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+}
+
+/* Shared Box Styling */
+.sidebar-box {
+  background: white;
+  border-radius: 16px; /* 16px radius for boxes */
+  padding: 12px;
+  border: 1px solid #E4E4E4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.variables-box {
+  /* Specific styling for variables box if needed */
+}
+
+.tutorial-box {
+  /* Specific styling for tutorial box if needed */
+}
+
+.box-title {
+  color: #727179;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  margin: 0;
+  line-height: 24px;
+  display: flex;
+  align-items: center; /* Center align vertically */
+}
+
+.variables-list {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  margin-top: 8px; /* Add space below the title */
+}
+
+.variable-item {
+  padding: 4px 6px;
+  background: rgba(255, 107, 0, 0.15);
+  border-radius: 5px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  cursor: grab;
+  transition: all 0.2s ease;
+  user-select: none;
+  height: 24px !important; /* Force exactly 24px height */
+  min-height: 24px;
+  max-height: 24px;
+  box-sizing: border-box; /* Include padding in height calculation */
+}
+
+.variable-item:hover {
+  background: rgba(255, 107, 0, 0.25);
+  transform: translateY(-1px);
+}
+
+.variable-item:active {
+  cursor: grabbing;
+  transform: translateY(0);
+}
+
+.drag-indicator {
+  color: #727179;
+  font-size: 16px; /* Keep 16px for icon */
+  width: 16px;
+  height: 16px;
+  cursor: grab;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.variable-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Regular weight */
+  line-height: 16px;
+  color: #FF6B00;
+}
+
+.variable-name {
+  color: #FF6B00;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  line-height: 24px;
+  word-wrap: break-word;
+}
+
+/* Input with Variables */
+.input-with-variables {
+  position: relative;
+}
+
+.input-variables-overlay {
+  position: absolute;
+  top: 8px;
+  left: 13px;
+  right: 13px;
+  bottom: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.input-variable-chip {
+  background: rgba(255, 107, 0, 0.15);
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #FF6B00;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.input-variable-chip .drag-indicator {
+  font-size: 12px;
+  color: #727179;
+}
+
+.input-variable-chip .variable-text {
+  font-weight: 500;
+}
+
+.input-variable-chip .variable-close {
+  font-size: 14px;
+  cursor: pointer;
+  color: #FF6B00;
+  transition: color 0.2s ease;
+}
+
+.input-variable-chip .variable-close:hover {
+  color: #d32f2f;
+}
+
+/* Adjust input padding when variables are present */
+.input-with-variables .form-input {
+  padding-left: 13px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide input text when variables are present */
+.input-with-variables:has(.input-variable-chip) .form-input {
+  color: transparent;
+}
+
+.input-with-variables:has(.input-variable-chip) .form-input::placeholder {
+  color: transparent;
+}
+
+/* Legacy styles for old approach */
+.input-variables-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  padding: 4px 0;
+  z-index: 5;
+}
+
+.input-variable-tag {
+  background: rgba(255, 107, 0, 0.15);
+  border: 1px solid rgba(255, 107, 0, 0.3);
+  border-radius: 4px;
+  padding: 2px 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  color: #FF6B00;
+}
+
+.input-variable-tag .drag-indicator {
+  font-size: 12px;
+  color: #727179;
+}
+
+.input-variable-tag .variable-text {
+  font-weight: 500;
+}
+
+.input-variable-tag .variable-close {
+  font-size: 14px;
+  cursor: pointer;
+  color: #FF6B00;
+  transition: color 0.2s ease;
+}
+
+.input-variable-tag .variable-close:hover {
+  color: #d32f2f;
+}
+
+/* Drop Zone Styling */
+.drop-zone {
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.drop-zone:hover {
+  border-color: #FF6B00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+/* Rich text editor drop zone */
+.rich-text-editor-container.drop-zone:hover .rich-text-editor {
+  border-color: #FF6B00;
+  box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.1);
+}
+
+.rich-text-editor-container.drop-zone::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.rich-text-editor-container.drop-zone:hover::after {
+  border-color: #FF6B00;
+  background-color: rgba(255, 107, 0, 0.05);
+}
+
+/* Variable styling in rich text editor */
+.rich-text-editor-container .rich-text-editor__editor span[style*="background-color: #e3f2fd"] {
+  display: inline-block !important;
+  background-color: rgba(255, 107, 0, 0.15) !important;
+  color: #FF6B00 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+  margin: 0 2px !important;
+  border: 1px solid rgba(255, 107, 0, 0.3) !important;
+  cursor: default;
+  user-select: none;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 20px !important;
+}
+
+/* Tutorial Section - Updated */
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 6px; /* Reduced from 12px to 6px for closer video */
+  gap: 8px;
+  min-height: 24px; /* Ensure proper height for alignment */
+}
+
+.tutorial-duration {
+  color: #A4A3AB;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center; /* Ensure vertical alignment within the duration span */
+}
+
+.tutorial-video {
+  width: 100%;
+  border-radius: 12px; /* 12px radius for video */
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.tutorial-video iframe {
+  width: 100%;
+  height: 160px;
+  border: none;
+  display: block;
+}
+
+.tutorial-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  gap: 8px;
+  user-select: none;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #D1D5DB;
+  border-radius: 4px;
+  background: white;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkmark {
+  background: #252525;
+  border-color: #252525;
+}
+
+.checkbox-input:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-label:hover .checkmark {
+  border-color: #252525;
+}
+
+/* Template Selector Styles */
+.template-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 280px; /* Match sidebar width */
+}
+
+.template-option {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  background: #EBEBEB !important;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.template-option.selected {
+  background: #EBEBEB !important;
+}
+
+.template-option:hover:not(.selected) {
+  background: #E0E0E0 !important;
+}
+
+.template-radio {
+  margin: 0;
+  margin-right: 12px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.template-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500; /* Medium weight */
+  color: #0A0A0A;
+  cursor: pointer;
+  flex: 1;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .create-template-content {
+    flex-direction: column;
+    gap: 16px;
+    padding: 72px 20px 20px 12px; /* Keep same top padding on mobile */
+  }
+  
+  .sidebar-container {
+    width: 100%;
+    order: -1;
+  }
+  
+  .main-form-container {
+    width: 100%;
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .create-template-content {
+    padding: 72px 16px 20px 12px; /* Keep same top padding on smaller screens */
+  }
+  
+  .main-form-container {
+    padding: 20px;
+  }
+  
+  .sidebar-box {
+    padding: 16px;
+  }
+  
+  .form-actions {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-template-page {
+    padding: 12px;
+  }
+  
+  .main-form-container {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .sidebar-box {
+    border-radius: 12px;
+  }
+}

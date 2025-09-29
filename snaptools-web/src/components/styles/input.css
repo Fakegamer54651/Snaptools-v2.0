@@ -1,0 +1,138 @@
+/* Input Component Styles - Based on Figma Specifications */
+
+.input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Label Styles */
+.input-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500; /* Medium */
+  line-height: 14px;
+  letter-spacing: 0%;
+  color: #0A0A0A;
+  margin-bottom: 4px; /* 4px spacing from label to input */
+  display: block;
+}
+
+/* Input Field Styles */
+.input-field {
+  padding: 8px 12px; /* 8px top/bottom, 12px left/right */
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: white;
+  
+  /* Font styling */
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  letter-spacing: 0%;
+  line-height: auto;
+  color: #0A0A0A; /* Text color when typing */
+  
+  /* Remove default styling */
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  
+  /* Transition for smooth focus effect */
+  transition: border-color 0.2s ease;
+}
+
+/* Placeholder Styles */
+.input-field::placeholder {
+  color: #838383;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0%;
+  opacity: 1; /* Ensure consistent placeholder visibility across browsers */
+}
+
+/* Focus State */
+.input-field:focus {
+  border-color: #252525;
+  /* No glow / no box-shadow as specified */
+}
+
+/* Textarea Variant */
+.input-field.textarea {
+  min-height: 120px; /* Default height for textarea */
+  resize: vertical; /* Allow vertical resizing */
+  line-height: 1.4; /* Better line height for multiline text */
+  padding-top: 12px; /* Slightly more top padding for textarea */
+  padding-bottom: 12px;
+}
+
+/* Toolbar Container */
+.input-toolbar {
+  margin-top: 0; /* Directly underneath the textarea */
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #D1D5DB;
+  border-top: none; /* Connect to textarea */
+  border-radius: 0 0 8px 8px; /* Only bottom corners rounded */
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+/* Adjust textarea border-radius when toolbar is present */
+.input-container:has(.input-toolbar) .input-field.textarea {
+  border-radius: 8px 8px 0 0; /* Only top corners rounded */
+  border-bottom: none; /* Connect to toolbar */
+}
+
+/* Support for browsers that don't support :has() */
+.input-field.textarea.with-toolbar {
+  border-radius: 8px 8px 0 0;
+  border-bottom: none;
+}
+
+/* Disabled State (optional) */
+.input-field:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+.input-field:disabled::placeholder {
+  color: #ccc;
+}
+
+/* Hover State (subtle) */
+.input-field:hover:not(:focus):not(:disabled) {
+  border-color: #b0b5bb;
+}
+
+/* Error State (optional - for future use) */
+.input-field.error {
+  border-color: #ef4444;
+}
+
+.input-field.error:focus {
+  border-color: #dc2626;
+}
+
+/* Success State (optional - for future use) */
+.input-field.success {
+  border-color: #10b981;
+}
+
+.input-field.success:focus {
+  border-color: #059669;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .input-field {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .input-label {
+    font-size: 14px; /* Keep label size consistent */
+  }
+}

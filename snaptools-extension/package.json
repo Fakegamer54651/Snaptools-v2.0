@@ -1,0 +1,39 @@
+{
+  "name": "snaptools-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for SnapTools v2",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "npx tsc && vite build",
+    "preview": "vite preview",
+    "type-check": "npx tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.246",
+    "@types/node": "^24.5.2",
+    "@types/react": "^18.2.37",
+    "@types/react-dom": "^18.2.15",
+    "@typescript-eslint/eslint-plugin": "^6.10.0",
+    "@typescript-eslint/parser": "^6.10.0",
+    "@vitejs/plugin-react": "^4.1.1",
+    "eslint": "^8.53.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "typescript": "^5.2.2",
+    "vite": "^4.5.0"
+  },
+  "keywords": [
+    "chrome-extension",
+    "snaptools",
+    "react",
+    "typescript",
+    "vite"
+  ],
+  "author": "SnapTools Team",
+  "license": "MIT"
+}

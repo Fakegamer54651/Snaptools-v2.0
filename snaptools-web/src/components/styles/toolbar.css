@@ -1,0 +1,280 @@
+/* Custom Toolbar Styles - Based on Figma Specifications */
+
+.custom-toolbar {
+  width: 100%;
+  padding: 4px 8px; /* 4px top/bottom, 8px left/right */
+  border: 1px solid #D1D5DB;
+  border-top: none; /* Connect to editor */
+  border-radius: 0 0 8px 8px; /* Only bottom corners rounded */
+  background: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 36px; /* Ensure minimum height */
+  box-sizing: border-box;
+}
+
+/* Left and Right Sections */
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Toolbar Groups */
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+/* Dropdown Containers */
+.toolbar-dropdown {
+  position: relative;
+  display: inline-flex;
+}
+
+/* Dropdown Button */
+.dropdown-button {
+  height: 28px;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: #252525;
+  font-family: 'SF Pro Text', 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 19.6px;
+}
+
+.dropdown-button:hover {
+  background-color: #E5E7EB;
+}
+
+.dropdown-button:active {
+  background-color: #D1D5DB;
+}
+
+/* Dropdown Text */
+.dropdown-text {
+  white-space: nowrap;
+  color: #252525;
+}
+
+/* Chevron Icon */
+.chevron {
+  font-size: 16px !important;
+  color: #252525;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  min-width: 150px;
+  padding: 4px 0;
+  margin-top: 2px;
+}
+
+.dropdown-menu button {
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  text-align: left;
+  cursor: pointer;
+  font-family: 'SF Pro Text', 'Poppins', sans-serif;
+  font-size: 14px;
+  color: #252525;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-menu button:hover {
+  background-color: #F3F4F6;
+}
+
+.dropdown-menu button .material-symbols-rounded {
+  font-size: 16px;
+}
+
+/* Color Picker Button */
+.color-picker-button {
+  height: 28px;
+  padding: 0 8px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.color-picker-button:hover {
+  background-color: #E5E7EB;
+}
+
+/* Color Square */
+.color-square {
+  width: 20px;
+  height: 20px;
+  background-color: #000000;
+  border-radius: 4px;
+  border: 1px solid #D1D5DB;
+}
+
+/* Color Picker Menu */
+.color-picker-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: white;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 8px;
+  margin-top: 2px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  width: 200px;
+}
+
+.color-option {
+  width: 20px;
+  height: 20px;
+  border: 1px solid #D1D5DB;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+  background: none;
+  padding: 0;
+}
+
+.color-option:hover {
+  transform: scale(1.1);
+  border-color: #252525;
+}
+
+/* Toolbar Buttons */
+.toolbar-button {
+  width: 28px;
+  height: 28px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #252525;
+}
+
+.toolbar-button:hover {
+  background-color: #E5E7EB; /* Light gray hover */
+}
+
+.toolbar-button:active,
+.toolbar-button.active {
+  background-color: #252525; /* Dark background */
+  color: white; /* White icon */
+}
+
+.toolbar-button .material-symbols-rounded {
+  font-size: 16px;
+  color: inherit;
+}
+
+/* Material Icons Base */
+.material-symbols-rounded {
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .custom-toolbar {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  
+  .toolbar-right {
+    gap: 4px;
+  }
+  
+  .toolbar-group {
+    gap: 1px;
+  }
+  
+  .dropdown-button {
+    padding: 0 6px;
+    font-size: 13px;
+  }
+  
+  .toolbar-button {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .toolbar-button .material-symbols-rounded {
+    font-size: 14px;
+  }
+}
+
+/* Focus States for Accessibility */
+.dropdown-button:focus,
+.toolbar-button:focus,
+.color-picker-button:focus {
+  outline: 2px solid #3B82F6;
+  outline-offset: 1px;
+}
+
+.dropdown-menu button:focus {
+  background-color: #DBEAFE;
+  outline: none;
+}
+
+/* Animation for Dropdown Appearance */
+.dropdown-menu,
+.color-picker-menu {
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

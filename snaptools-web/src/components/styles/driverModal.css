@@ -1,0 +1,368 @@
+/* Driver Modal Overlay */
+.driver-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal Container */
+.driver-modal {
+  background: white;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 560px;
+}
+
+/* Header */
+.driver-modal__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.driver-modal__title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 25.2px;
+  color: #18181B;
+  margin: 0;
+}
+
+.driver-modal__close {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: none;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.driver-modal__close:hover {
+  background: #f9fafb;
+}
+
+.driver-modal__close .material-icons {
+  font-size: 24px;
+  color: black;
+}
+
+/* Modal Container - Side by Side Layout */
+.driver-modal-container {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.driver-modal__tutorial-section {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+/* Form Content */
+.driver-modal__content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.driver-modal__tutorial-section {
+  width: 280px;
+  flex-shrink: 0;
+}
+
+.driver-modal .form-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.driver-modal .form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+
+.driver-modal .form-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0A0A0A;
+  line-height: 14px;
+  margin: 0;
+}
+
+.driver-modal .form-input {
+  height: 36px;
+  outline: 1px solid #D1D5DB;
+  outline-offset: -1px;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 13px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  background: white;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+}
+
+.form-input::placeholder {
+  color: #838383;
+}
+
+.form-input:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: -2px;
+}
+
+.driver-modal .form-input--error {
+  outline: 1px solid #DC2626;
+  outline-offset: -1px;
+}
+
+.driver-modal .form-input--error:focus {
+  outline: 2px solid #DC2626;
+  outline-offset: -2px;
+}
+
+.form-error-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #DC2626;
+  margin-top: -2px;
+  line-height: 12px;
+}
+
+/* Phone Input */
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 13px !important;
+}
+
+.phone-flag-icon {
+  width: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  flex: 1;
+  padding: 0;
+  height: auto;
+}
+
+.phone-input::placeholder {
+  color: #838383;
+}
+
+/* Form Row (for Truck# and Trailer#) */
+.driver-modal .form-row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.driver-modal .form-row .form-field {
+  flex: 1;
+}
+
+/* Buttons */
+.driver-modal__buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.btn-cancel {
+  flex: 1;
+  height: 40px;
+  background: #EBEBEB;
+  color: #0A0A0A;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel:hover {
+  background: #e0e0e0;
+}
+
+.btn-save {
+  flex: 1;
+  height: 40px;
+  background: #252525;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-save:hover {
+  background: #1a1a1a;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .driver-modal {
+    width: 95%;
+    padding: 16px;
+    margin: 20px;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .driver-modal-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .driver-modal__tutorial-section {
+    width: 100%;
+  }
+}
+
+/* Tutorial Box Styling (copied from templates) */
+.tutorial-box {
+  background: white;
+  border-radius: 16px;
+  padding: 12px;
+  border: 1px solid #E4E4E4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.box-title {
+  color: #727179;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  margin: 0;
+  line-height: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.tutorial-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+  gap: 8px;
+  min-height: 24px;
+}
+
+.tutorial-duration {
+  color: #A4A3AB;
+  font-size: 12px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+}
+
+.tutorial-video {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.tutorial-video iframe {
+  width: 100%;
+  height: 160px;
+  border: none;
+  display: block;
+}
+
+.tutorial-checkbox {
+  display: flex;
+  align-items: center;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  gap: 8px;
+  user-select: none;
+}
+
+.checkbox-input {
+  display: none;
+}
+
+.checkmark {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #D1D5DB;
+  border-radius: 4px;
+  background: white;
+  position: relative;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.checkbox-input:checked + .checkmark {
+  background: #252525;
+  border-color: #252525;
+}
+
+.checkbox-input:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}

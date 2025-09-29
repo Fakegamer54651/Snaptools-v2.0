@@ -1,0 +1,395 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap');
+
+/* Global reset for sign-in page */
+body.signin-page {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Main Container */
+.signin-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background-color: #F9FAFB;
+  font-family: 'Poppins', sans-serif;
+  gap: 40px; /* 40px gap between left and right sections */
+  overflow: hidden; /* Prevent scrollbars */
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Blurred Background Circles */
+.signin-gradient-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.signin-gradient-circle {
+  position: absolute;
+  width: 205.01px; /* 124.25px * 1.65 = 65% bigger */
+  height: 205.01px;
+  border-radius: 50%;
+  filter: blur(84.93px); /* 51.47px * 1.65 = 65% bigger blur */
+}
+
+.signin-gradient-circle-1 {
+  background: #FBE097; /* Yellow */
+  top: -100px; /* -130px + 30px down */
+  left: -100px; /* -130px + 30px right */
+}
+
+.signin-gradient-circle-2 {
+  background: #81C7F0; /* Blue */
+  top: -100px; /* -130px + 30px down */
+  left: 86px; /* 56px + 30px right */
+}
+
+.signin-gradient-circle-3 {
+  background: #FE7FBE; /* Pink */
+  top: -118px; /* -148px + 30px down */
+  left: -7px; /* -37px + 30px right */
+}
+
+/* Left Side - Sign In Form */
+.signin-left {
+  flex: 0 0 32%; /* 32% of the container width for more space */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 20px 20px 20px; /* 20px padding on all sides */
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+/* Sign In Card (Invisible Container) */
+.signin-card {
+  width: 100%;
+  /* Removed max-width to fill container horizontally */
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  /* No background, no shadow - invisible container */
+}
+
+/* Right Side - Banner */
+.signin-right {
+  flex: 0 0 68%; /* 68% of the container width (100% - 32% left side) */
+  padding: 20px 0 20px 0; /* Only top and bottom padding, no horizontal padding */
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+
+.banner-container {
+  width: 100%;
+  height: calc(100vh - 40px); /* Full viewport height minus top and bottom padding (20px each) */
+  border-radius: 32px 0 0 32px; /* Rounded corners only on the left side */
+  overflow: hidden;
+  position: relative;
+  box-shadow: 0px 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+.banner-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.banner-logo-overlay {
+  position: absolute;
+  top: 32px;
+  left: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.mini-logo {
+  width: 40px;
+  height: 40px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.banner-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700; /* Bold */
+  line-height: 32px;
+  color: #3F0900;
+  margin: 10px 0 0 0; /* 10px top margin from mini logo */
+}
+
+.banner-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  line-height: 1.2;
+  color: #3F0900;
+  margin: 14px 0 0 0; /* 14px top margin from title */
+}
+
+/* Title */
+.signin-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 36px;
+  color: #0A0A0A;
+  text-align: center;
+  margin: 0;
+}
+
+/* Buttons Container */
+.signin-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+/* Sign In Buttons */
+.signin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  height: 36px;
+  background: var(--Primary-Brand, #252525);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  color: #FFFFFF;
+}
+
+.signin-btn:hover {
+  background-color: #1a1a1a;
+}
+
+.signin-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 37, 37, 0.3);
+}
+
+/* Button Icon */
+.signin-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Footer Text */
+.signin-footer {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #727179;
+  text-align: center;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.footer-link {
+  color: #0A0A0A;
+  text-decoration: underline;
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.footer-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .signin-container {
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .signin-left {
+    order: 2;
+    flex: none;
+    padding: 0 px 20px 20px;
+  }
+  
+  .signin-card {
+    height: auto;
+  }
+  
+  .signin-right {
+    order: 1;
+    flex: none;
+    height: 300px;
+    padding: 20px 0 0 20px; /* Left padding and top padding only */
+  }
+  
+  .banner-container {
+    min-height: 250px;
+    border-radius: 32px 0 0 32px; /* Maintain left-only rounded corners */
+  }
+}
+
+@media (max-width: 768px) {
+  .signin-container {
+    gap: 16px;
+  }
+  
+  .signin-left {
+    padding: 0 16px 16px 16px;
+  }
+  
+  .signin-card {
+    width: 100%;
+    /* Removed max-width for mobile to fill container */
+    gap: 24px;
+  }
+
+  /* Scale down circles for mobile */
+  .signin-gradient-circle {
+    width: 154px; /* Proportionally smaller for mobile (205 * 0.75) */
+    height: 154px;
+    filter: blur(64px);
+  }
+
+  .signin-gradient-circle-1 {
+    top: -75px; /* Adjusted for new positioning */
+    left: -75px;
+  }
+
+  .signin-gradient-circle-2 {
+    top: -75px;
+    left: 64px;
+  }
+
+  .signin-gradient-circle-3 {
+    top: -89px;
+    left: 6px;
+  }
+  
+  .signin-title {
+    font-size: 20px;
+    line-height: 30px;
+  }
+  
+  .signin-btn {
+    height: 40px;
+    font-size: 13px;
+  }
+  
+  .signin-icon {
+    width: 16px;
+    height: 16px;
+  }
+  
+  .signin-right {
+    height: 250px;
+    padding: 16px 0 0 16px; /* Left padding and top padding only */
+  }
+  
+  .banner-container {
+    min-height: 200px;
+    border-radius: 24px 0 0 24px; /* Smaller radius for mobile */
+  }
+
+  .banner-title {
+    font-size: 20px;
+    line-height: 28px;
+    margin: 8px 0 0 0;
+  }
+
+  .banner-subtitle {
+    font-size: 13px;
+    margin: 12px 0 0 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .signin-container {
+    gap: 12px;
+  }
+  
+  .signin-left {
+    padding: 0 12px 12px 12px;
+  }
+  
+  .signin-card {
+    gap: 20px;
+  }
+
+  /* Further scale down circles for smallest screens */
+  .signin-gradient-circle {
+    width: 110px; /* Proportionally smaller for smallest screens (205 * 0.54) */
+    height: 110px;
+    filter: blur(46px);
+  }
+
+  .signin-gradient-circle-1 {
+    top: -55px; /* Adjusted for new positioning */
+    left: -55px;
+  }
+
+  .signin-gradient-circle-2 {
+    top: -55px;
+    left: 46px;
+  }
+
+  .signin-gradient-circle-3 {
+    top: -64px;
+    left: 4px;
+  }
+  
+  .signin-right {
+    height: 200px;
+    padding: 12px 0 0 12px; /* Left padding and top padding only */
+  }
+  
+  .banner-container {
+    min-height: 150px;
+    border-radius: 16px 0 0 16px; /* Even smaller radius for smallest screens */
+  }
+  
+  .banner-logo-overlay {
+    top: 16px;
+    left: 16px;
+  }
+
+  .mini-logo {
+    width: 32px;
+    height: 32px;
+  }
+
+  .banner-title {
+    font-size: 18px;
+    line-height: 24px;
+    margin: 8px 0 0 0;
+  }
+
+  .banner-subtitle {
+    font-size: 12px;
+    margin: 10px 0 0 0;
+  }
+}

@@ -1,0 +1,291 @@
+/* Rich Email Editor Styles - Quill Integration */
+
+.rich-email-editor {
+  width: 100%;
+  position: relative;
+  border: 1px solid #D1D5DB;
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 0.2s ease; /* Same smooth transition as other inputs */
+}
+
+/* Remove any Quill default hover effects */
+.rich-email-editor .ql-container:hover,
+.rich-email-editor .ql-editor:hover {
+  border-color: inherit !important;
+}
+
+/* Main Quill container - editor first */
+.rich-email-editor .ql-container {
+  border: none !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  order: 1;
+  flex: 1;
+  border-radius: 8px 8px 0 0;
+}
+
+.rich-email-editor .ql-editor {
+  padding: 12px !important;
+  color: #0A0A0A !important;
+  font-family: 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+  min-height: 200px;
+  border: none !important;
+}
+
+.rich-email-editor .ql-editor.ql-blank::before {
+  color: #838383 !important;
+  font-style: normal !important;
+  left: 12px !important;
+  right: 12px !important;
+}
+
+/* Position Quill toolbar at bottom */
+.rich-email-editor .ql-toolbar {
+  order: 2 !important;
+  border: none !important;
+  border-top: 1px solid #D1D5DB !important;
+  border-radius: 0 0 8px 8px !important;
+  padding: 4px 8px !important;
+  background: white !important;
+}
+
+/* Toolbar Groups - Style Quill's built-in groups */
+.rich-email-editor .ql-toolbar .ql-formats {
+  margin-right: 8px !important;
+}
+
+.rich-email-editor .ql-toolbar .ql-formats:last-child {
+  margin-right: 0 !important;
+}
+
+/* Toolbar Buttons - Figma specs */
+.rich-email-editor .ql-toolbar button {
+  height: 28px !important;
+  width: 28px !important;
+  border: none !important;
+  border-radius: 4px !important;
+  background: transparent !important;
+  color: #252525 !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  transition: all 0.2s ease !important;
+  margin: 0 1px !important;
+  padding: 0 !important;
+}
+
+.rich-email-editor .ql-toolbar button:hover {
+  background: #E5E7EB !important;
+}
+
+.rich-email-editor .ql-toolbar button.ql-active {
+  background: #252525 !important;
+  color: white !important;
+}
+
+.rich-email-editor .ql-toolbar button svg {
+  width: 16px !important;
+  height: 16px !important;
+  fill: currentColor !important;
+}
+
+/* Toolbar Selects/Dropdowns */
+.rich-email-editor .ql-toolbar select {
+  height: 28px !important;
+  border: 1px solid #D1D5DB !important;
+  border-radius: 4px !important;
+  background: white !important;
+  color: #252525 !important;
+  font-family: 'SF Pro Text', 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  line-height: 19.6px !important;
+  cursor: pointer !important;
+  min-width: 80px !important;
+  padding: 0 8px !important;
+  margin: 0 1px !important;
+}
+
+.rich-email-editor .ql-toolbar select:hover {
+  background: #F9FAFB !important;
+}
+
+.rich-email-editor .ql-toolbar select:focus {
+  outline: none !important;
+  border-color: #252525 !important;
+}
+
+/* Color picker styling */
+.rich-email-editor .ql-toolbar .ql-color .ql-picker-label,
+.rich-email-editor .ql-toolbar .ql-background .ql-picker-label {
+  width: 28px !important;
+  height: 28px !important;
+  border-radius: 4px !important;
+  border: 1px solid #D1D5DB !important;
+  background: white !important;
+}
+
+.rich-email-editor .ql-toolbar .ql-color .ql-picker-label:hover,
+.rich-email-editor .ql-toolbar .ql-background .ql-picker-label:hover {
+  background: #F9FAFB !important;
+}
+
+/* Dropdown menus */
+.rich-email-editor .ql-toolbar .ql-picker-options {
+  border: 1px solid #D1D5DB !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+  background: white !important;
+}
+
+.rich-email-editor .ql-toolbar .ql-picker-item {
+  color: #252525 !important;
+  font-family: 'SF Pro Text', 'Poppins', sans-serif !important;
+  font-size: 14px !important;
+}
+
+.rich-email-editor .ql-toolbar .ql-picker-item:hover {
+  background: #F3F4F6 !important;
+}
+
+/* Focus and hover states to match other inputs exactly */
+.rich-email-editor:hover:not(:focus-within) {
+  border-color: #b0b5bb; /* Same subtle hover as other inputs */
+}
+
+.rich-email-editor:focus-within {
+  border-color: #252525;
+  box-shadow: none;
+  outline: none;
+}
+
+/* Variable token styling - Orange pill-style tokens */
+.rich-email-editor .ql-editor .ql-variable,
+.rich-email-editor .ql-editor .variable-token {
+  color: #FF510E !important;
+  font-weight: 500 !important;
+  background: #FFF4EC !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  margin: 0 1px;
+  display: inline;
+  white-space: nowrap;
+}
+
+.rich-email-editor .ql-editor .ql-variable[contenteditable="false"],
+.rich-email-editor .ql-editor .variable-token[contenteditable="false"] {
+  user-select: none;
+  cursor: default;
+}
+
+/* Ensure variables work with formatting */
+.rich-email-editor .ql-editor strong .ql-variable,
+.rich-email-editor .ql-editor em .ql-variable,
+.rich-email-editor .ql-editor u .ql-variable,
+.rich-email-editor .ql-editor strong .variable-token,
+.rich-email-editor .ql-editor em .variable-token,
+.rich-email-editor .ql-editor u .variable-token {
+  color: #FF510E !important; /* Keep orange color even when formatted */
+}
+
+/* Legacy support for span[data-var] */
+.rich-email-editor .ql-editor span[data-var] {
+  color: #FF510E !important;
+  font-weight: 500 !important;
+  background: #FFF4EC !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  margin: 0 1px;
+}
+
+.rich-email-editor .ql-editor span[data-var][contenteditable="false"] {
+  user-select: none;
+  cursor: default;
+}
+
+/* Content styling */
+.rich-email-editor .ql-editor p {
+  margin: 0 0 8px 0;
+}
+
+.rich-email-editor .ql-editor h1,
+.rich-email-editor .ql-editor h2,
+.rich-email-editor .ql-editor h3,
+.rich-email-editor .ql-editor h4,
+.rich-email-editor .ql-editor h5,
+.rich-email-editor .ql-editor h6 {
+  margin: 12px 0 8px 0;
+  font-weight: 600;
+}
+
+.rich-email-editor .ql-editor h1 {
+  font-size: 24px;
+}
+
+.rich-email-editor .ql-editor h2 {
+  font-size: 20px;
+}
+
+.rich-email-editor .ql-editor ul,
+.rich-email-editor .ql-editor ol {
+  margin: 8px 0;
+  padding-left: 24px;
+}
+
+.rich-email-editor .ql-editor blockquote {
+  margin: 8px 0;
+  padding: 8px 16px;
+  border-left: 4px solid #e0e0e0;
+  background: #f9f9f9;
+}
+
+.rich-email-editor .ql-editor img {
+  max-width: 100%;
+  height: auto;
+}
+
+.rich-email-editor .ql-editor a {
+  color: #1976d2;
+  text-decoration: underline;
+}
+
+/* Remove Quill branding */
+.rich-email-editor .ql-tooltip {
+  z-index: 1000;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .custom-toolbar {
+    padding: 2px 4px;
+    gap: 1px;
+  }
+  
+  .toolbar-group {
+    gap: 1px;
+    margin-right: 4px;
+  }
+  
+  .custom-toolbar button {
+    height: 24px;
+    width: 24px;
+    font-size: 12px;
+  }
+  
+  .custom-toolbar select {
+    height: 24px;
+    min-width: 60px;
+    padding: 0 4px;
+    font-size: 13px;
+  }
+}

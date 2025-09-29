@@ -1,0 +1,195 @@
+/* Контейнер таблицы шаблонов */
+.template-table-container {
+  width: 100%;
+  border-radius: 16px;
+  border: 1px solid #e4e4e4;
+  background-color: white;
+  overflow: hidden;
+}
+
+.template-table {
+  width: 100%;
+}
+
+/* Строка шаблона */
+.template-row {
+  width: 100%;
+  padding: 12px;
+  border-top: 1px solid #E5E7EB;
+  justify-content: space-between;
+  align-items: center;
+  display: flex;
+  transition: background-color 0.2s ease;
+  box-sizing: border-box;
+  min-height: 80px;
+}
+
+.template-row:first-child {
+  border-top: none;
+}
+
+.template-row:hover {
+  background-color: #f9fafb;
+}
+
+/* Основная информация о шаблоне */
+.template-info {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 12px;
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  min-width: 0; /* Позволяет flex элементу сжиматься */
+  margin-right: 16px; /* Отступ от кнопок действий */
+}
+
+.template-main-info {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 12px;
+  display: flex;
+  width: 100%;
+}
+
+/* Верхняя строка с названием и email */
+.template-header-row {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Название шаблона */
+.template-name {
+  color: #252525;
+  font-size: 16px;
+  font-family: Poppins;
+  font-weight: 600;
+  line-height: 24px;
+  word-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 300px; /* Ограничиваем ширину названия */
+}
+
+/* Email отправителя */
+.template-sender-email {
+  color: #727179;
+  font-size: 12px;
+  font-family: Poppins;
+  font-weight: 400;
+  line-height: 20px;
+  word-wrap: break-word;
+}
+
+/* Тема письма с инлайн тегами */
+.template-subject {
+  color: #384252;
+  font-size: 14px;
+  font-family: 'SF Pro Text', -apple-system, BlinkMacSystemFont, sans-serif;
+  font-weight: 400;
+  word-wrap: break-word;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Инлайн теги внутри текста */
+.template-tag-inline {
+  padding: 2px 8px;
+  background: rgba(255, 137.70, 0, 0.15);
+  border-radius: 5px;
+  color: #FF6B00;
+  font-size: 14px;
+  font-family: Poppins;
+  font-weight: 400;
+  line-height: 18px;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+/* Кнопки действий */
+.template-actions {
+  justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+  display: flex;
+  flex-shrink: 0; /* Кнопки не сжимаются */
+  width: 96px; /* Фиксированная ширина для двух кнопок (40px + 8px gap + 40px + 8px margin) */
+}
+
+/* Стили кнопок действий (наследуются из table.css) */
+.action-button {
+  width: 40px;
+  height: 40px;
+  padding: 4px;
+  border-radius: 12px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  background-color: transparent;
+}
+
+.action-button.edit:hover {
+  background-color: rgba(0, 0, 0, 0.08);
+}
+
+.action-button.delete:hover {
+  background-color: rgba(0, 0, 0, 0.12);
+}
+
+.action-button .material-symbols-rounded {
+  font-size: 20px;
+  color: #0A0A0A;
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 20;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+  .template-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    padding: 16px 12px;
+  }
+  
+  .template-info {
+    margin-right: 0;
+    width: 100%;
+  }
+  
+  .template-actions {
+    align-self: flex-end;
+    width: auto;
+  }
+  
+  .template-name {
+    max-width: none;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 480px) {
+  .template-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .template-subject {
+    flex-wrap: wrap;
+  }
+}

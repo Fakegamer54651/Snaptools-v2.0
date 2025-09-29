@@ -1,0 +1,202 @@
+/* Variable Input Component Styles - Based on Input Component Specifications */
+
+.variable-input-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* Label Styles - Match Input component */
+.variable-input-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500; /* Medium */
+  line-height: 14px;
+  letter-spacing: 0%;
+  color: #0A0A0A;
+  margin-bottom: 4px; /* 4px spacing from label to input */
+  display: block;
+}
+
+/* Input Field Styles - Match Input component exactly */
+.variable-input-field {
+  padding: 8px 12px; /* 8px top/bottom, 12px left/right */
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: white;
+  
+  /* Font styling */
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  letter-spacing: 0%;
+  line-height: 1.4;
+  color: #0A0A0A; /* Text color when typing */
+  
+  /* Remove default styling */
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 38px; /* Same height as regular input */
+  max-height: 38px; /* Prevent expansion */
+  overflow: hidden; /* Hide overflow */
+  white-space: nowrap; /* Single line behavior */
+  
+  /* Transition for smooth focus effect */
+  transition: border-color 0.2s ease;
+  
+  /* Cursor and selection */
+  cursor: text;
+}
+
+/* Placeholder Styles */
+.variable-input-field:empty::before {
+  content: attr(data-placeholder);
+  color: #838383;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0%;
+  pointer-events: none;
+  opacity: 1;
+}
+
+/* Focus State - Match Input component */
+.variable-input-field.focused,
+.variable-input-field:focus {
+  border-color: #252525;
+  /* No glow / no box-shadow as specified */
+}
+
+/* Hover State - Match Input component */
+.variable-input-field:hover:not(.focused):not(:focus) {
+  border-color: #b0b5bb;
+}
+
+/* Variable Token Styling - Orange pill-style tokens */
+.variable-input-field .ql-variable,
+.variable-input-field .variable-token {
+  color: #FF510E !important;
+  font-weight: 500 !important;
+  background: #FFF4EC !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  border: none !important;
+  margin: 0 1px;
+  display: inline;
+  white-space: nowrap;
+  vertical-align: baseline;
+}
+
+.variable-input-field .ql-variable[contenteditable="false"],
+.variable-input-field .variable-token[contenteditable="false"] {
+  user-select: none;
+  cursor: default;
+}
+
+/* Drag & Drop Visual Feedback */
+.variable-input-field.drag-over {
+  border-color: #FF6B00 !important;
+  background-color: rgba(255, 107, 0, 0.05);
+}
+
+.variable-input-field:not(.accepts-variables).drag-over {
+  border-color: #ef4444 !important;
+  background-color: rgba(239, 68, 68, 0.05);
+  cursor: not-allowed;
+}
+
+/* Ensure single-line behavior */
+.variable-input-field br {
+  display: none;
+}
+
+.variable-input-field div {
+  display: inline;
+}
+
+/* Selection styling */
+.variable-input-field::selection {
+  background: #3b82f6;
+  color: white;
+}
+
+.variable-input-field .ql-variable::selection {
+  background: #FF510E;
+  color: white;
+}
+
+/* Disabled State (optional) */
+.variable-input-field:disabled {
+  background-color: #f5f5f5;
+  color: #999;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+.variable-input-field:disabled::before {
+  color: #ccc;
+}
+
+/* Error State (optional - for future use) */
+.variable-input-field.error {
+  border-color: #ef4444;
+}
+
+.variable-input-field.error.focused,
+.variable-input-field.error:focus {
+  border-color: #dc2626;
+}
+
+/* Success State (optional - for future use) */
+.variable-input-field.success {
+  border-color: #10b981;
+}
+
+.variable-input-field.success.focused,
+.variable-input-field.success:focus {
+  border-color: #059669;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .variable-input-field {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .variable-input-label {
+    font-size: 14px; /* Keep label size consistent */
+  }
+}
+
+/* Fix for contentEditable quirks */
+.variable-input-field:focus {
+  outline: none;
+}
+
+/* Ensure proper text flow with variables */
+.variable-input-field * {
+  display: inline;
+  line-height: inherit;
+}
+
+.variable-input-field .ql-variable {
+  display: inline !important;
+}
+
+/* Prevent line breaks and formatting */
+.variable-input-field p,
+.variable-input-field div:not(.ql-variable) {
+  display: inline;
+  margin: 0;
+  padding: 0;
+}
+
+/* Caret styling */
+.variable-input-field {
+  caret-color: #0A0A0A;
+}
+
+.variable-input-field.focused {
+  caret-color: #0A0A0A;
+}

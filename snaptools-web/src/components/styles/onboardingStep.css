@@ -1,0 +1,529 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
+
+/* Main container - centers the content and step progress */
+.onboarding-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  box-sizing: border-box;
+  background-color: #FFFFFF;
+  gap: 20px; /* Default gap between step progress and card */
+  position: relative;
+  overflow: hidden;
+}
+
+/* Back Button - Match template creation styling */
+.onboarding-back-button-container {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 10;
+}
+
+.onboarding-back-button {
+  background: transparent;
+  border: none;
+  padding: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.onboarding-back-button:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.onboarding-back-arrow {
+  width: 12.98px;
+  height: 12.64px;
+  color: #0A0A0A;
+  font-size: 16px;
+}
+
+.onboarding-back-text {
+  color: #0A0A0A;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  line-height: 20px;
+  text-align: center;
+}
+
+/* Gradient Background Circles */
+.onboarding-gradient-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.onboarding-gradient-circle {
+  position: absolute;
+  width: 369.02px; /* 205.01px * 1.8 = 80% bigger */
+  height: 369.02px;
+  border-radius: 50%;
+  filter: blur(152.87px); /* 84.93px * 1.8 = 80% bigger blur */
+}
+
+.onboarding-gradient-circle-1 {
+  background: #FBE097; /* Yellow */
+  top: -180px; /* -100px * 1.8 = 80% bigger positioning */
+  left: -180px;
+}
+
+.onboarding-gradient-circle-2 {
+  background: #81C7F0; /* Blue */
+  top: -180px;
+  left: 154.8px; /* 86px * 1.8 = 80% bigger positioning */
+}
+
+.onboarding-gradient-circle-3 {
+  background: #FE7FBE; /* Pink */
+  top: -212.4px; /* -118px * 1.8 = 80% bigger positioning */
+  left: -12.6px; /* -7px * 1.8 = 80% bigger positioning */
+}
+
+/* Onboarding card */
+.onboarding-card {
+  background: white;
+  border-radius: 24px;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 600px;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+/* Step Progress - Match header width */
+.step-progress {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%; /* Fill the width of the header-steps container, which is sized by header */
+  position: relative;
+  z-index: 1;
+}
+
+/* Header and Steps Container - Groups header and step progress */
+.onboarding-header-steps-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  padding: 16px;
+  gap: 16px; /* Internal gap between header and step progress */
+}
+
+/* Onboarding Header - Inside the container, hugged to content */
+.onboarding-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  width: auto; /* Hug content horizontally */
+}
+
+.onboarding-mini-logo {
+  width: 44px;
+  height: 22px;
+  margin-bottom: 8px;
+}
+
+.onboarding-header-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 36px;
+  color: #0A0A0A;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.onboarding-header-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 20px;
+  color: #0A0A0A;
+  margin: 0;
+  text-align: center;
+  max-width: 600px;
+}
+
+.step-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 12px;
+  font-weight: 400;
+  color: #727179;
+  line-height: 16px;
+  text-align: left; /* Left aligned as requested */
+  word-wrap: break-word;
+}
+
+.step-bar-container {
+  display: flex;
+  gap: 4px;
+  width: 100%;
+}
+
+.step-segment {
+  flex: 1;
+  height: 4px;
+  background-color: #E5E7EB;
+  border-radius: 3px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.6s ease;
+}
+
+/* Continuous gradient for step progress - static styles */
+.step-segment.active:nth-child(1) {
+  /* First step gets first half of gradient: dark blue to purple */
+  background: linear-gradient(90deg, #011E30 0%, #065887 50%, #5B7AC2 100%);
+}
+
+.step-segment.active:nth-child(2) {
+  /* Second step gets second half of gradient: purple to yellow */
+  background: linear-gradient(90deg, #D67BC3 0%, #FFA9AF 50%, #FBE097 100%);
+}
+
+/* For future extension - if more steps are added */
+.step-segment.active:nth-child(3) {
+  background: linear-gradient(90deg, #FBE097 0%, #FFD700 100%);
+}
+
+.step-segment.active:nth-child(4) {
+  background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+}
+
+/* Animation only for newly activated steps */
+.step-segment.active.new-step {
+  animation: fillGradient 0.8s ease-out;
+  transform-origin: left center;
+}
+
+/* Gradient filling animation */
+@keyframes fillGradient {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* Title */
+.onboarding-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 20px;
+  font-weight: 600;
+  color: #0A0A0A;
+  line-height: 24px;
+  margin: 0;
+  text-align: center;
+}
+
+/* Content area with directional transitions */
+.onboarding-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Forward animation (next step) - slide from right to left */
+.onboarding-content.slide-forward {
+  animation: slideInFromRight 0.4s ease-out;
+}
+
+/* Backward animation (back step) - slide from left to right */
+.onboarding-content.slide-backward {
+  animation: slideInFromLeft 0.4s ease-out;
+}
+
+/* Slide in from right (for next step) */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Slide in from left (for back step) */
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Input row (side by side inputs) */
+.input-row {
+  display: flex;
+  gap: 16px;
+}
+
+.input-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Label styling */
+.input-label {
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  color: #0A0A0A;
+  line-height: 14px;
+  margin: 0;
+}
+
+/* Input field styling - Match standard input.css */
+.input-field {
+  padding: 8px 12px; /* 8px top/bottom, 12px left/right */
+  border-radius: 8px;
+  border: 1px solid #D1D5DB;
+  background: white;
+  
+  /* Font styling */
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400; /* Regular */
+  letter-spacing: 0%;
+  line-height: auto;
+  color: #0A0A0A; /* Text color when typing */
+  
+  /* Remove default styling */
+  outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  
+  /* Transition for smooth focus effect */
+  transition: border-color 0.2s ease;
+}
+
+.input-field::placeholder {
+  color: #838383;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0%;
+  opacity: 1; /* Ensure consistent placeholder visibility across browsers */
+}
+
+.input-field:focus {
+  border-color: #252525;
+  /* No glow / no box-shadow as specified */
+}
+
+.input-field:hover:not(:focus):not(:disabled) {
+  border-color: #b0b5bb;
+}
+
+/* Phone Input - Match DriverModal styling */
+.phone-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px !important;
+}
+
+.phone-flag-icon {
+  width: 28px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.phone-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  color: #0A0A0A;
+  flex: 1;
+  padding: 0;
+  height: auto;
+}
+
+.phone-input::placeholder {
+  color: #838383;
+}
+
+/* Next button */
+.onboarding-next-btn {
+  width: 100%;
+  height: 36px;
+  background: #252525;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 24px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onboarding-next-btn:hover:not(:disabled) {
+  background-color: #1a1a1a;
+}
+
+.onboarding-next-btn:disabled {
+  background: #D7D7D7;
+  cursor: not-allowed;
+  color: #727179;
+  font-weight: 500; /* Medium weight for disabled state */
+}
+
+.onboarding-next-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(37, 37, 37, 0.3);
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .onboarding-container {
+    padding: 16px;
+    gap: 24px;
+  }
+  
+  .onboarding-card {
+    padding: 24px;
+    width: 100%;
+    max-width: 500px;
+  }
+  
+  .step-progress {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .onboarding-header-subtitle {
+    max-width: 500px;
+    padding: 0 16px;
+  }
+  
+  .input-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .input-group {
+    flex: none;
+  }
+
+  /* Scale down gradient circles for tablet */
+  .onboarding-gradient-circle {
+    width: 276.77px; /* 369.02px * 0.75 */
+    height: 276.77px;
+    filter: blur(114.65px); /* 152.87px * 0.75 */
+  }
+
+  .onboarding-gradient-circle-1 {
+    top: -135px; /* -180px * 0.75 */
+    left: -135px;
+  }
+
+  .onboarding-gradient-circle-2 {
+    top: -135px;
+    left: 116.1px; /* 154.8px * 0.75 */
+  }
+
+  .onboarding-gradient-circle-3 {
+    top: -159.3px; /* -212.4px * 0.75 */
+    left: -9.45px; /* -12.6px * 0.75 */
+  }
+}
+
+@media (max-width: 480px) {
+  .onboarding-container {
+    padding: 12px;
+    gap: 20px;
+  }
+  
+  .onboarding-card {
+    padding: 20px;
+    border-radius: 16px;
+    width: 100%;
+    max-width: 400px;
+  }
+  
+  .step-progress {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .onboarding-header-title {
+    font-size: 20px;
+    line-height: 30px;
+  }
+
+  .onboarding-header-subtitle {
+    max-width: 400px;
+    padding: 0 12px;
+    font-size: 13px;
+  }
+
+  .onboarding-mini-logo {
+    width: 36px;
+    height: 18px;
+  }
+
+  /* Scale down gradient circles for mobile */
+  .onboarding-gradient-circle {
+    width: 199.32px; /* 369.02px * 0.54 */
+    height: 199.32px;
+    filter: blur(82.55px); /* 152.87px * 0.54 */
+  }
+
+  .onboarding-gradient-circle-1 {
+    top: -97.2px; /* -180px * 0.54 */
+    left: -97.2px;
+  }
+
+  .onboarding-gradient-circle-2 {
+    top: -97.2px;
+    left: 83.59px; /* 154.8px * 0.54 */
+  }
+
+  .onboarding-gradient-circle-3 {
+    top: -114.7px; /* -212.4px * 0.54 */
+    left: -6.8px; /* -12.6px * 0.54 */
+  }
+}
