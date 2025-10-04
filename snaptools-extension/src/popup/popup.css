@@ -347,13 +347,24 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  margin-bottom: 32px;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 .empty-templates-illustration {
   width: 138px; /* Increased by ~15% from 120px */
   height: 138px; /* Increased by ~15% from 120px */
-  margin-bottom: 16px;
+  margin-bottom: 8px;
+}
+
+.empty-templates-text-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 
 .empty-templates-title {
@@ -377,6 +388,7 @@ body {
   letter-spacing: -0.00525rem;
   margin: 0;
   white-space: nowrap;
+  margin-bottom: 16px;
 }
 
 /* Templates content area */
@@ -404,10 +416,9 @@ body {
 .add-template-button {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
-  width: 100%;
   height: 44px;
+  padding: 0 8px 0 12px;
   background: #252525;
   color: white;
   border: none;
@@ -418,8 +429,7 @@ body {
   line-height: 24px;
   cursor: pointer;
   transition: background-color 0.2s ease;
-  margin-top: 16px;
-  margin-bottom: 16px;
+  width: fit-content;
 }
 
 .add-template-button:hover {
@@ -445,6 +455,10 @@ body {
 }
 
 /* Template card */
+.templates-list .add-template-button {
+  margin-top: 16px;
+}
+
 .template-card {
   background: #F1F1F1;
   border-radius: 12px;

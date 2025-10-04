@@ -275,17 +275,23 @@ const PopupApp: React.FC = () => {
                   <p className="empty-templates-description">
                     Once you create a template it will appear here
                   </p>
+                  {/* Add template button */}
+                  <button className="add-template-button" onClick={handleAddTemplate}>
+                    <img src={addIconSvg} alt="Add" className="add-template-icon" />
+                    template
+                  </button>
                 </div>
               ) : (
                 // Templates list header
-                <h1 className="templates-title">Your Templates</h1>
+                <>
+                  <h1 className="templates-title">Your Templates</h1>
+                  {/* Add template button */}
+                  <button className="add-template-button" onClick={handleAddTemplate}>
+                    <img src={addIconSvg} alt="Add" className="add-template-icon" />
+                    template
+                  </button>
+                </>
               )}
-              
-              {/* Add template button */}
-              <button className="add-template-button" onClick={handleAddTemplate}>
-                <img src={addIconSvg} alt="Add" className="add-template-icon" />
-                template
-              </button>
               
               {/* Templates list */}
               {templates.length > 0 && (
