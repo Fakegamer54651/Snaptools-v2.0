@@ -1,5 +1,5 @@
-// Background service worker for SnapTools v2 Extension
-console.log('[st-ext] background loaded');
+// Background service worker for SnapTools Minimal
+console.log('[st-ext] background running');
 
 // Basic service worker event listeners
 chrome.runtime.onInstalled.addListener(() => {
