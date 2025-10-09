@@ -2,7 +2,7 @@
   "name": "snaptools-extension",
   "version": "2.0.0",
   "scripts": {
-    "build": "tsc && if not exist dist mkdir dist && xcopy /E /I /Y public dist && if not exist dist\\content\\pdfsign mkdir dist\\content\\pdfsign && copy src\\content\\pdfsign\\sample.pdf dist\\content\\pdfsign\\sample.pdf"
+    "build": "tsc && xcopy /E /I /Y public dist && copy src\\content\\pdfsign\\sample.pdf dist\\content\\pdfsign\\sample.pdf"
   },
   "devDependencies": {
     "@types/chrome": "^0.1.22",

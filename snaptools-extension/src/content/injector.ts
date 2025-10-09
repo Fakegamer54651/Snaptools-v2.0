@@ -1,7 +1,7 @@
 // Gmail Sign button injector
 // Logs: Gmail tab → Chrome Console: [st-ext] …
 
-import { openOverlayViewer } from './pdfsign/overlayViewer';
+import { openOverlayViewer } from './pdfsign/overlayViewer.js';
 
 console.log('[st-ext] Gmail injector active');
 
