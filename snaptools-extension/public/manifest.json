@@ -24,10 +24,10 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "viewer/*",
-        "vendor/*",
+        "vendor/pdf.min.js",
+        "vendor/pdf.worker.min.js",
         "content/pdfsign/*",
-        "content/pdfsign/overlayViewer.js"
+        "viewer/*"
       ],
       "matches": ["<all_urls>"]
     }

@@ -109,28 +109,17 @@ canvas {
 `;
 
 async function loadPDFJS(): Promise<any> {
-  if (pdfjsLib) {
-    console.log('[st-view] PDF.js already loaded');
-    return pdfjsLib;
-  }
-
-  // Check if already in window
   if ((window as any).pdfjsLib) {
-    pdfjsLib = (window as any).pdfjsLib;
-    pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-    console.log('[st-view] PDF.js found in window');
-    return pdfjsLib;
+    console.log('[st-view] PDF.js already loaded');
+    return (window as any).pdfjsLib;
   }
 
-  console.log('[st-view] Loading PDF.js...');
-  
-  // Load PDF.js from extension bundle
-  pdfjsLib = await new Promise((resolve, reject) => {
+  const url = chrome.runtime.getURL('vendor/pdf.min.js');
+  console.log('[st-view] Attempting to load PDF.js from', url);
+
+  return new Promise((resolve, reject) => {
     const script = document.createElement('script');
-    script.src = chrome.runtime.getURL('vendor/pdf.min.js');
-    script.type = 'text/javascript';
-    script.async = false; // important: block until loaded
-    
+    script.src = url;
     script.onload = () => {
       const lib = (window as any).pdfjsLib;
       if (!lib) {
@@ -138,19 +127,14 @@ async function loadPDFJS(): Promise<any> {
         return;
       }
       lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-      pdfjsLib = lib;
-      console.log('[st-view] PDF.js loaded successfully');
+      console.log('[st-view] PDF.js loaded successfully ✅');
       resolve(lib);
     };
-    
-    script.onerror = (err) => {
-      reject(new Error('Failed to load PDF.js: ' + err));
+    script.onerror = (err: any) => {
+      reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
     };
-    
     document.head.appendChild(script);
   });
-
-  return pdfjsLib;
 }
 
 export async function openOverlayViewer(options: { src?: string; name?: string } = {}): Promise<void> {
