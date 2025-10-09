@@ -121,26 +121,41 @@ async function loadPDFJS(): Promise<any> {
     const script = document.createElement('script');
     script.src = url;
     script.async = false;
-    
+
     script.onload = () => {
-      // Give UMD a moment to attach to window
-      setTimeout(() => {
-        const lib = (window as any).pdfjsLib || (window as any)['pdfjs-dist/build/pdf'];
-        if (!lib) {
-          console.error('[st-view] window object keys:', Object.keys(window).filter(k => k.includes('pdf')));
-          reject(new Error('PDF.js not available after script load'));
+      // Bridge PDF.js from page world to extension world
+      const bridge = document.createElement('script');
+      bridge.textContent = `
+        (() => {
+          const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
+          if (lib) {
+            window.pdfjsLib = lib;
+            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: true } }));
+          } else {
+            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: false } }));
+          }
+        })();
+      `;
+      document.documentElement.appendChild(bridge);
+      bridge.remove();
+
+      document.addEventListener('__st_pdfjs_ready', (e: any) => {
+        if (!e.detail.ok) {
+          console.error('[st-view] PDF.js bridge failed');
+          reject(new Error('PDF.js not available after bridge'));
           return;
         }
+        const lib = (window as any).pdfjsLib;
         lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
         console.log('[st-view] PDF.js loaded successfully ✅');
         resolve(lib);
-      }, 10);
+      }, { once: true });
     };
-    
+
     script.onerror = (err: any) => {
       reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
     };
-    
+
     document.head.appendChild(script);
   });
 }
