@@ -110,31 +110,44 @@ canvas {
 
 async function loadPDFJS(): Promise<any> {
   if (pdfjsLib) {
+    console.log('[st-view] PDF.js already loaded');
     return pdfjsLib;
   }
 
-  pdfjsLib = (window as any).pdfjsLib;
-  
-  if (pdfjsLib) {
+  // Check if already in window
+  if ((window as any).pdfjsLib) {
+    pdfjsLib = (window as any).pdfjsLib;
     pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
+    console.log('[st-view] PDF.js found in window');
     return pdfjsLib;
   }
 
+  console.log('[st-view] Loading PDF.js...');
+  
   // Load PDF.js from extension bundle
   pdfjsLib = await new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = chrome.runtime.getURL('vendor/pdf.min.js');
+    script.type = 'text/javascript';
+    script.async = false; // important: block until loaded
+    
     script.onload = () => {
-      pdfjsLib = (window as any).pdfjsLib;
-      if (pdfjsLib) {
-        pdfjsLib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-        resolve(pdfjsLib);
-      } else {
+      const lib = (window as any).pdfjsLib;
+      if (!lib) {
         reject(new Error('PDF.js not available after script load'));
+        return;
       }
+      lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
+      pdfjsLib = lib;
+      console.log('[st-view] PDF.js loaded successfully');
+      resolve(lib);
     };
-    script.onerror = () => reject(new Error('pdf.min.js failed to load'));
-    document.documentElement.appendChild(script);
+    
+    script.onerror = (err) => {
+      reject(new Error('Failed to load PDF.js: ' + err));
+    };
+    
+    document.head.appendChild(script);
   });
 
   return pdfjsLib;
@@ -142,6 +155,12 @@ async function loadPDFJS(): Promise<any> {
 
 export async function openOverlayViewer(options: { src?: string; name?: string } = {}): Promise<void> {
   const { src, name } = options;
+
+  // Check if viewer already open
+  if (document.getElementById(HOST_ID)) {
+    console.log('[st-view] Viewer already open');
+    return;
+  }
 
   // Reuse or create host
   if (!currentHost) {
