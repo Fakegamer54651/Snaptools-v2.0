@@ -25,11 +25,12 @@
       "resources": [
         "content/pdfsign/viewer.html",
         "content/pdfsign/viewer.js",
+        "content/pdfsign/overlayViewer.js",
         "content/pdfsign/sample.pdf",
         "vendor/pdf.min.js",
         "vendor/pdf.worker.min.js"
       ],
-      "matches": ["<all_urls>"]
+      "matches": ["https://mail.google.com/*", "https://*.googleusercontent.com/*", "<all_urls>"]
     }
   ],
   "action": {
