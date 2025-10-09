@@ -123,15 +123,18 @@ async function loadPDFJS(): Promise<any> {
     script.async = false;
     
     script.onload = () => {
-      // Check multiple possible global names
-      const lib = (window as any).pdfjsLib || (window as any)['pdfjs-dist/build/pdf'];
-      if (!lib) {
-        reject(new Error('PDF.js not available after script load'));
-        return;
-      }
-      lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-      console.log('[st-view] PDF.js loaded successfully ✅');
-      resolve(lib);
+      // Give UMD a moment to attach to window
+      setTimeout(() => {
+        const lib = (window as any).pdfjsLib || (window as any)['pdfjs-dist/build/pdf'];
+        if (!lib) {
+          console.error('[st-view] window object keys:', Object.keys(window).filter(k => k.includes('pdf')));
+          reject(new Error('PDF.js not available after script load'));
+          return;
+        }
+        lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
+        console.log('[st-view] PDF.js loaded successfully ✅');
+        resolve(lib);
+      }, 10);
     };
     
     script.onerror = (err: any) => {
