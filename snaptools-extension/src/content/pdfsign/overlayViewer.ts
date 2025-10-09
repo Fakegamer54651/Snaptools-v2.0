@@ -120,8 +120,11 @@ async function loadPDFJS(): Promise<any> {
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     script.src = url;
+    script.async = false;
+    
     script.onload = () => {
-      const lib = (window as any).pdfjsLib;
+      // Check multiple possible global names
+      const lib = (window as any).pdfjsLib || (window as any)['pdfjs-dist/build/pdf'];
       if (!lib) {
         reject(new Error('PDF.js not available after script load'));
         return;
@@ -130,9 +133,11 @@ async function loadPDFJS(): Promise<any> {
       console.log('[st-view] PDF.js loaded successfully ✅');
       resolve(lib);
     };
+    
     script.onerror = (err: any) => {
       reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
     };
+    
     document.head.appendChild(script);
   });
 }
