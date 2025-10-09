@@ -1,5 +1,6 @@
 // Content script for SnapTools Minimal
-import { PDFViewer } from './pdfsign/viewer/pdfViewer';
+// Temporarily disabled: PDF viewer integration
+// import { PDFViewer } from './pdfsign/viewer/pdfViewer';
 
 console.log('[st-ext] content script loaded successfully', window.location.href);
 
@@ -7,8 +8,8 @@ console.log('[st-ext] content script loaded successfully', window.location.href)
 const processedContainers = new WeakSet<Element>();
 const processedIframes = new WeakSet<HTMLIFrameElement>();
 
-// Initialize PDF viewer instance
-const pdfViewer = new PDFViewer();
+// Temporarily disabled: PDF viewer instance
+// const pdfViewer = new PDFViewer();
 
 // Gmail PDF sign button injection
 if (window.location.hostname === 'mail.google.com') {
@@ -189,26 +190,22 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
   btn.dataset.snaptoolsSign = 'true';
   btn.setAttribute('title', 'Sign PDF');
   btn.style.cssText = `
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    height: 28px;
-    margin-left: 6px;
-    padding: 0 10px;
-    border: 1px solid #dadce0;
+    background: #f1f3f4;
+    border: none;
+    padding: 4px 10px;
     border-radius: 4px;
-    background: #f8f9fa;
-    color: #202124;
-    font-size: 12px;
-    font-family: Google Sans, Roboto, Arial, sans-serif;
     cursor: pointer;
+    font-size: 12px;
+    margin-left: 6px;
+    color: #202124;
+    font-family: Google Sans, Roboto, Arial, sans-serif;
   `;
 
   btn.addEventListener('mouseenter', () => btn.style.background = '#f1f3f4');
   btn.addEventListener('mouseleave', () => btn.style.background = '#f8f9fa');
 
   // Add click handler
-  btn.addEventListener('click', async (e) => {
+  btn.addEventListener('click', (e) => {
     e.preventDefault();
     e.stopPropagation();
     
@@ -218,7 +215,14 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
     const pdfUrl = getPDFUrl(pdfElement);
     
     if (pdfUrl) {
-      await pdfViewer.open(pdfUrl);
+      console.log(`[st-ext] Opening popup for PDF: ${pdfUrl}`);
+      
+      // Open popup window
+      window.open(
+        chrome.runtime.getURL('popup/popup.html'),
+        '_blank',
+        'width=800,height=600,noopener,noreferrer'
+      );
     } else {
       console.warn('[st-ext] Could not find PDF URL');
       alert('Could not find PDF URL. Please try downloading the file first.');
@@ -228,7 +232,7 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
   // Append button
   parent.appendChild(btn);
 
-  console.log(`[st-ext] Added Sign button for ${fileName}`);
+  console.log(`[st-ext] Added Sign button next to Add to Drive`);
 }
 
 function getPDFUrl(element: Element): string | null {
