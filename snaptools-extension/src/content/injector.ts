@@ -1,6 +1,8 @@
 // Gmail Sign button injector
 // Logs: Gmail tab → Chrome Console: [st-ext] …
 
+import { openOverlayViewer } from './pdfsign/overlayViewer';
+
 console.log('[st-ext] Gmail injector active');
 
 // Track processed elements
@@ -97,18 +99,17 @@ function scanRoot(root: Document) {
     });
     
     // Click handler
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('[st-ext] Sign click', { filename, url });
+      console.log('[st-ext] Sign click', { filename, hasUrl: !!url });
       
-      // Send message to background to open viewer
-      chrome.runtime.sendMessage({
-        type: 'OPEN_VIEWER',
-        filename: filename || 'document.pdf',
-        url: url
-      });
+      try {
+        await openOverlayViewer({ src: url, name: filename || 'document.pdf' });
+      } catch (error) {
+        console.log('[st-ext] viewer open failed', error);
+      }
     });
     
     // Append button to action bar
