@@ -6,8 +6,7 @@
   "permissions": ["storage", "windows", "tabs"],
   "host_permissions": [
     "https://mail.google.com/*",
-    "https://*.googleusercontent.com/*",
-    "https://cdnjs.cloudflare.com/*"
+    "https://*.googleusercontent.com/*"
   ],
   "background": {
     "service_worker": "background/index.js"
@@ -24,10 +23,11 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "content/pdfsign/viewer.html",
+        "content/pdfsign/viewer.js",
+        "content/pdfsign/sample.pdf",
         "vendor/pdf.min.js",
-        "vendor/pdf.worker.min.js",
-        "content/pdfsign/*",
-        "viewer/*"
+        "vendor/pdf.worker.min.js"
       ],
       "matches": ["<all_urls>"]
     }

@@ -1,354 +1,147 @@
-// SnapTools Overlay Viewer - In-page full-screen PDF viewer
-// Logs: Gmail page → [st-view] from overlay viewer
-
-// Testing notes:
-// - Which consoles: Gmail page → [st-ext] from injector, [st-view] from overlay viewer
-// - Scenarios:
-//   - Click Sign with/without real URL
-//   - Zoom +/- works
-//   - Close on ×, ESC, or backdrop click
-
-const HOST_ID = '__st_viewer_host';
-let currentHost: HTMLDivElement | null = null;
-let shadowRoot: ShadowRoot | null = null;
-let pdfDoc: any = null;
-let scale = 1.25;
-let pdfjsLib: any = null;
-
-// CSS content to inject into shadow
-const cssContent = `
-:host, * {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-.backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 2147483000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.container {
-  width: 92vw;
-  height: 88vh;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.toolbar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  border-bottom: 1px solid #eee;
-  background: #fff;
-}
-
-.title {
-  font: 600 14px/1.2 'Google Sans', Roboto, Arial, sans-serif;
-  color: #202124;
-}
-
-.spacer {
-  flex: 1;
-}
-
-.toolbar button {
-  background: #f1f3f4;
-  border: 1px solid #dadce0;
-  border-radius: 4px;
-  padding: 6px 12px;
-  font-size: 14px;
-  cursor: pointer;
-  color: #202124;
-  min-width: 32px;
-}
-
-.toolbar button:hover {
-  background: #e8eaed;
-}
-
-.toolbar button:active {
-  background: #dadce0;
-}
-
-#close {
-  font-size: 20px;
-  line-height: 1;
-  font-weight: 300;
-}
-
-#pages {
-  flex: 1;
-  overflow: auto;
-  background: #f5f5f5;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 16px;
-}
-
-canvas {
-  background: #fff;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  display: block;
-  max-width: 100%;
-  height: auto;
-}
-`;
-
-async function loadPDFJS(): Promise<any> {
-  if ((window as any).pdfjsLib) {
-    console.log('[st-view] PDF.js already loaded');
-    return (window as any).pdfjsLib;
-  }
-
-  const url = chrome.runtime.getURL('vendor/pdf.min.js');
-  console.log('[st-view] Attempting to load PDF.js from', url);
-
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.async = false;
-
-    // Set up message listener before loading script
-    const handleMessage = (event: MessageEvent) => {
-      if (event.data?.source !== 'snaptools-pdfjs') return;
-
-      window.removeEventListener('message', handleMessage);
-
-      if (event.data.ok) {
-        console.log('[st-view] PDF.js bridged successfully ✅');
-        const lib = (window as any).pdfjsLib;
-        lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-        resolve(lib);
-      } else {
-        console.error('[st-view] PDF.js bridge failed');
-        reject(new Error('PDF.js not available after bridge'));
-      }
-    };
-
-    window.addEventListener('message', handleMessage);
-
-    script.onload = () => {
-      // Ask page context to check if pdfjsLib exists
-      window.postMessage({ source: 'snaptools-extension', cmd: 'bridge-pdfjs' }, '*');
-    };
-
-    script.onerror = (err: any) => {
-      window.removeEventListener('message', handleMessage);
-      reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
-    };
-
-    document.head.appendChild(script);
-  });
-}
+// SnapTools Iframe-based PDF Viewer
+// Bypasses all CSP and isolated world issues by using a separate iframe
 
 export async function openOverlayViewer(options: { src?: string; name?: string } = {}): Promise<void> {
   const { src, name } = options;
 
   // Check if viewer already open
-  if (document.getElementById(HOST_ID)) {
+  if (document.getElementById('__st_viewer_host')) {
     console.log('[st-view] Viewer already open');
     return;
   }
 
-  // Reuse or create host
-  if (!currentHost) {
-    currentHost = document.createElement('div');
-    currentHost.id = HOST_ID;
-    document.documentElement.appendChild(currentHost);
+  console.log('[st-view] Opening iframe viewer:', { url: src, name });
 
-    // Attach shadow root
-    shadowRoot = currentHost.attachShadow({ mode: 'open' });
-
-    // Inject CSS
-    const style = document.createElement('style');
-    style.textContent = cssContent;
-    shadowRoot.appendChild(style);
-
-    console.log('[st-view] overlay mounted');
-  }
-
-  if (!shadowRoot) return;
-
-  // Build structure
-  shadowRoot.innerHTML = `
-    <style>${cssContent}</style>
-    <div class="backdrop">
-      <div class="container">
-        <div class="toolbar">
-          <div class="title">SnapTools — ${name || 'PDF Viewer'}</div>
-          <div class="spacer"></div>
-          <button id="zoomOut">−</button>
-          <button id="zoomIn">+</button>
-          <button id="close">×</button>
-        </div>
-        <div id="pages"></div>
-      </div>
-    </div>
-  `;
-
-  // Get DOM elements from shadow
-  const backdrop = shadowRoot.querySelector('.backdrop') as HTMLDivElement;
-  const container = shadowRoot.querySelector('.container') as HTMLDivElement;
-  const closeBtn = shadowRoot.querySelector('#close') as HTMLButtonElement;
-  const zoomInBtn = shadowRoot.querySelector('#zoomIn') as HTMLButtonElement;
-  const zoomOutBtn = shadowRoot.querySelector('#zoomOut') as HTMLButtonElement;
-  const pagesContainer = shadowRoot.querySelector('#pages') as HTMLDivElement;
-
-  // Close handlers
-  const handleClose = () => closeOverlayViewer();
-
-  closeBtn.addEventListener('click', handleClose);
-  
-  backdrop.addEventListener('click', (e) => {
-    if (e.target === backdrop) {
-      handleClose();
-    }
+  // 1) Create overlay host
+  const host = document.createElement('div');
+  host.id = '__st_viewer_host';
+  Object.assign(host.style, {
+    position: 'fixed',
+    inset: '0',
+    zIndex: '2147483000'
   });
 
-  // ESC key handler
+  const shadow = host.attachShadow({ mode: 'open' });
+  document.documentElement.appendChild(host);
+
+  // 2) Inject styles
+  const style = document.createElement('style');
+  style.textContent = `
+    .backdrop{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-start;justify-content:center;padding:24px;}
+    .container{width: calc(100% - 48px); height: calc(100% - 48px); background:#fff;border-radius:10px;box-shadow:0 10px 40px rgba(0,0,0,.25);overflow:hidden;display:flex;flex-direction:column}
+    .title{height:44px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #eee;padding:0 10px;font:500 14px/44px system-ui, Arial;}
+    .btns{display:flex;gap:6px}
+    .btn{border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer;padding:4px 8px}
+    iframe{border:0;flex:1}
+  `;
+  shadow.appendChild(style);
+
+  // 3) Build overlay structure
+  const backdrop = document.createElement('div');
+  backdrop.className = 'backdrop';
+  backdrop.innerHTML = `
+    <div class="container">
+      <div class="title">
+        <div>SnapTools — ${name || 'PDF'}</div>
+        <div class="btns">
+          <button class="btn" id="min">–</button>
+          <button class="btn" id="max">+</button>
+          <button class="btn" id="close">×</button>
+        </div>
+      </div>
+      <iframe id="viewer" src="${chrome.runtime.getURL('content/pdfsign/viewer.html')}"></iframe>
+    </div>
+  `;
+  shadow.appendChild(backdrop);
+
+  // 4) Fetch PDF bytes (content script has cookies)
+  async function fetchBytes(href: string): Promise<ArrayBuffer> {
+    try {
+      const resp = await fetch(href, { credentials: 'include' });
+      if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+      return await resp.arrayBuffer();
+    } catch (error) {
+      console.error('[st-view] Failed to fetch PDF:', error);
+      // Fallback to sample PDF
+      const sampleUrl = chrome.runtime.getURL('content/pdfsign/sample.pdf');
+      const sampleResp = await fetch(sampleUrl);
+      return await sampleResp.arrayBuffer();
+    }
+  }
+
+  const iframe = backdrop.querySelector('#viewer') as HTMLIFrameElement;
+  const iframeOrigin = new URL(iframe.src).origin;
+
+  // 5) Wait for iframe init message
+  function waitForInit(): Promise<void> {
+    return new Promise(resolve => {
+      function onMsg(ev: MessageEvent) {
+        if (ev.origin !== iframeOrigin) return;
+        if (ev.data && ev.data.source === 'st-view' && ev.data.type === 'init') {
+          window.removeEventListener('message', onMsg);
+          console.log('[st-view] Iframe ready');
+          resolve();
+        }
+      }
+      window.addEventListener('message', onMsg);
+    });
+  }
+
+  await waitForInit();
+
+  // 6) Fetch and send PDF bytes to iframe
+  if (src) {
+    const bytes = await fetchBytes(src);
+    iframe.contentWindow!.postMessage(
+      { source: 'st-ext', type: 'pdf-bytes', name, bytes },
+      iframeOrigin,
+      [bytes]
+    );
+  } else {
+    // No URL, use sample
+    const sampleUrl = chrome.runtime.getURL('content/pdfsign/sample.pdf');
+    const bytes = await fetch(sampleUrl).then(r => r.arrayBuffer());
+    iframe.contentWindow!.postMessage(
+      { source: 'st-ext', type: 'pdf-bytes', name: name || 'Sample PDF', bytes },
+      iframeOrigin,
+      [bytes]
+    );
+  }
+
+  // 7) Wire up controls
+  const closeBtn = shadow.getElementById('close');
+  const minBtn = shadow.getElementById('min');
+  const maxBtn = shadow.getElementById('max');
+
+  closeBtn!.onclick = () => {
+    host.remove();
+    console.log('[st-view] Viewer closed');
+  };
+
+  minBtn!.onclick = () => {
+    (backdrop.style as any).alignItems = 'flex-end';
+  };
+
+  maxBtn!.onclick = () => {
+    (backdrop.style as any).alignItems = 'flex-start';
+  };
+
+  // Close on ESC
   const handleEsc = (e: KeyboardEvent) => {
     if (e.key === 'Escape') {
-      handleClose();
+      host.remove();
       document.removeEventListener('keydown', handleEsc);
     }
   };
   document.addEventListener('keydown', handleEsc);
 
-  // Zoom handlers
-  zoomInBtn.addEventListener('click', async () => {
-    scale += 0.2;
-    await renderAllPages(pagesContainer);
-    console.log('[st-view] zoom in, scale:', scale);
-  });
-
-  zoomOutBtn.addEventListener('click', async () => {
-    if (scale > 0.5) {
-      scale -= 0.2;
-      await renderAllPages(pagesContainer);
-      console.log('[st-view] zoom out, scale:', scale);
-    }
-  });
-
-  // Load PDF.js
-  try {
-    await loadPDFJS();
-  } catch (error) {
-    console.error('[st-view] Failed to load PDF.js:', error);
-    pagesContainer.innerHTML = '<div style="color: #d93025; padding: 20px;">Failed to load PDF.js library</div>';
-    return;
-  }
-
-  // Load and render PDF
-  try {
-    let pdfData: ArrayBuffer;
-
-    if (src) {
-      console.log('[st-view] loaded src', { hasSrc: !!src, src });
-      
-      try {
-        const response = await fetch(src, {
-          credentials: 'include',
-          mode: 'cors'
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
-        }
-
-        pdfData = await response.arrayBuffer();
-        console.log('[st-view] fetched PDF from URL successfully');
-      } catch (fetchError) {
-        console.warn('[st-view] Failed to fetch PDF from URL:', fetchError);
-        console.log('[st-view] Falling back to sample PDF');
-        
-        // Fallback to sample
-        const sampleUrl = chrome.runtime.getURL('content/pdfsign/sample.pdf');
-        const sampleResponse = await fetch(sampleUrl);
-        pdfData = await sampleResponse.arrayBuffer();
-      }
-    } else {
-      console.log('[st-view] loaded src', { hasSrc: false });
-      console.log('[st-view] No URL provided, using sample PDF');
-      
-      const sampleUrl = chrome.runtime.getURL('content/pdfsign/sample.pdf');
-      const sampleResponse = await fetch(sampleUrl);
-      pdfData = await sampleResponse.arrayBuffer();
-    }
-
-    // Load PDF document
-    const loadingTask = pdfjsLib.getDocument({ data: pdfData });
-    pdfDoc = await loadingTask.promise;
-
-    console.log('[st-view] PDF loaded, pages:', pdfDoc.numPages);
-
-    // Render all pages
-    await renderAllPages(pagesContainer);
-
-  } catch (error) {
-    console.error('[st-view] Error loading/rendering PDF:', error);
-    pagesContainer.innerHTML = `<div style="color: #d93025; padding: 20px;">Failed to load PDF: ${error}</div>`;
-  }
-}
-
-async function renderAllPages(container: HTMLDivElement): Promise<void> {
-  if (!pdfDoc) return;
-
-  // Clear container
-  container.innerHTML = '';
-
-  // Render each page
-  for (let pageNum = 1; pageNum <= pdfDoc.numPages; pageNum++) {
-    await renderPage(pageNum, container);
-  }
-}
-
-async function renderPage(pageNumber: number, container: HTMLDivElement): Promise<void> {
-  const page = await pdfDoc.getPage(pageNumber);
-  const viewport = page.getViewport({ scale });
-
-  // Create canvas
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d')!;
-
-  canvas.height = viewport.height;
-  canvas.width = viewport.width;
-
-  // Append to container
-  container.appendChild(canvas);
-
-  // Render
-  const renderContext = {
-    canvasContext: context,
-    viewport: viewport
-  };
-
-  await page.render(renderContext).promise;
-
-  console.log('[st-view] rendered page', pageNumber);
+  console.log('[st-view] Overlay mounted and PDF loading');
 }
 
 export function closeOverlayViewer(): void {
-  if (currentHost) {
-    currentHost.remove();
-    currentHost = null;
-    shadowRoot = null;
-    pdfDoc = null;
-    scale = 1.25;
-    console.log('[st-view] overlay closed');
+  const host = document.getElementById('__st_viewer_host');
+  if (host) {
+    host.remove();
+    console.log('[st-view] Viewer closed');
   }
 }
-
