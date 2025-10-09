@@ -15,8 +15,8 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["content/injector.js"],
-      "run_at": "document_idle",
+      "js": ["content/pdfBridge.js", "content/injector.js"],
+      "run_at": "document_start",
       "type": "module",
       "all_frames": true
     }

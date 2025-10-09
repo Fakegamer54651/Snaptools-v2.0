@@ -122,37 +122,32 @@ async function loadPDFJS(): Promise<any> {
     script.src = url;
     script.async = false;
 
-    script.onload = () => {
-      // Bridge PDF.js from page world to extension world
-      const bridge = document.createElement('script');
-      bridge.textContent = `
-        (() => {
-          const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
-          if (lib) {
-            window.pdfjsLib = lib;
-            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: true } }));
-          } else {
-            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: false } }));
-          }
-        })();
-      `;
-      document.documentElement.appendChild(bridge);
-      bridge.remove();
+    // Set up message listener before loading script
+    const handleMessage = (event: MessageEvent) => {
+      if (event.data?.source !== 'snaptools-pdfjs') return;
 
-      document.addEventListener('__st_pdfjs_ready', (e: any) => {
-        if (!e.detail.ok) {
-          console.error('[st-view] PDF.js bridge failed');
-          reject(new Error('PDF.js not available after bridge'));
-          return;
-        }
+      window.removeEventListener('message', handleMessage);
+
+      if (event.data.ok) {
+        console.log('[st-view] PDF.js bridged successfully ✅');
         const lib = (window as any).pdfjsLib;
         lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-        console.log('[st-view] PDF.js loaded successfully ✅');
         resolve(lib);
-      }, { once: true });
+      } else {
+        console.error('[st-view] PDF.js bridge failed');
+        reject(new Error('PDF.js not available after bridge'));
+      }
+    };
+
+    window.addEventListener('message', handleMessage);
+
+    script.onload = () => {
+      // Ask page context to check if pdfjsLib exists
+      window.postMessage({ source: 'snaptools-extension', cmd: 'bridge-pdfjs' }, '*');
     };
 
     script.onerror = (err: any) => {
+      window.removeEventListener('message', handleMessage);
       reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
     };
 
