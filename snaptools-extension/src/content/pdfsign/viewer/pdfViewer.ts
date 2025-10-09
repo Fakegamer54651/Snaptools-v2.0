@@ -1,4 +1,4 @@
-// PDF Viewer using PDF.js from CDN
+// PDF Viewer using PDF.js from CDN (UMD build)
 // This is a lightweight, self-hosted PDF viewer for the Chrome extension
 
 export class PDFViewer {
@@ -9,33 +9,71 @@ export class PDFViewer {
   private currentPage = 1;
   private scale = 1.5;
   private pdfLib: any = null;
+  private isLoading = false;
 
   constructor() {
-    this.loadPDFJS();
+    // PDF.js will be loaded on demand
   }
 
   private async loadPDFJS(): Promise<void> {
-    // Load PDF.js from CDN
+    // Check if already loaded
     if ((window as any).pdfjsLib) {
       this.pdfLib = (window as any).pdfjsLib;
       return;
     }
 
+    // Prevent multiple simultaneous loads
+    if (this.isLoading) {
+      return new Promise((resolve) => {
+        const checkInterval = setInterval(() => {
+          if ((window as any).pdfjsLib) {
+            clearInterval(checkInterval);
+            this.pdfLib = (window as any).pdfjsLib;
+            resolve();
+          }
+        }, 100);
+      });
+    }
+
+    this.isLoading = true;
+
     return new Promise((resolve, reject) => {
+      // Load PDF.js UMD build from CDN
       const script = document.createElement('script');
       script.src = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';
+      script.type = 'text/javascript';
+      
       script.onload = () => {
-        this.pdfLib = (window as any).pdfjsLib;
+        // Access pdfjsLib from window
+        this.pdfLib = (window as any)['pdfjsLib'];
+        
+        if (!this.pdfLib) {
+          reject(new Error('PDF.js failed to load'));
+          return;
+        }
+
+        // Set worker source
         this.pdfLib.GlobalWorkerOptions.workerSrc = 
           'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        this.isLoading = false;
+        console.log('[st-ext] PDF.js loaded successfully');
         resolve();
       };
-      script.onerror = reject;
+
+      script.onerror = () => {
+        this.isLoading = false;
+        reject(new Error('Failed to load PDF.js from CDN'));
+      };
+
       document.head.appendChild(script);
     });
   }
 
   public async open(pdfUrl: string): Promise<void> {
+    console.log(`[st-ext] Opening PDF viewer for: ${pdfUrl}`);
+
+    // Load PDF.js if not already loaded
     if (!this.pdfLib) {
       await this.loadPDFJS();
     }
@@ -56,6 +94,7 @@ export class PDFViewer {
       console.log('[st-ext] PDF viewer initialized');
     } catch (error) {
       console.error('[st-ext] Error loading PDF:', error);
+      alert('Failed to load PDF. Please try again.');
       this.close();
     }
   }

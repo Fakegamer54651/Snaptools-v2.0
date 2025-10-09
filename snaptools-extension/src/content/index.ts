@@ -75,13 +75,12 @@ function initPdfSignButtons() {
         e.preventDefault();
         e.stopPropagation();
         const fileName = getFileName(element);
-        console.log(`[st-ext] Sign clicked for ${fileName}`);
+        console.log(`[st-ext] Sign button clicked for: ${fileName}`);
         
         // Get PDF URL from Gmail
         const pdfLink = element.closest('a') || element.querySelector('a');
         if (pdfLink && pdfLink instanceof HTMLAnchorElement) {
           const pdfUrl = pdfLink.href;
-          console.log(`[st-ext] Opening PDF viewer for: ${pdfUrl}`);
           await pdfViewer.open(pdfUrl);
         } else {
           console.warn('[st-ext] Could not find PDF URL');
@@ -169,13 +168,12 @@ function initPdfSignButtons() {
           e.preventDefault();
           e.stopPropagation();
           const fileName = getFileName(element);
-          console.log(`[st-ext] Sign clicked for ${fileName}`);
+          console.log(`[st-ext] Sign button clicked for: ${fileName}`);
           
           // Get PDF URL from Gmail
           const pdfLink = element.closest('a') || element.querySelector('a');
           if (pdfLink && pdfLink instanceof HTMLAnchorElement) {
             const pdfUrl = pdfLink.href;
-            console.log(`[st-ext] Opening PDF viewer for: ${pdfUrl}`);
             await pdfViewer.open(pdfUrl);
           } else {
             console.warn('[st-ext] Could not find PDF URL');
