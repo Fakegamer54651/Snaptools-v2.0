@@ -1,20 +1,28 @@
 // Gmail Sign button injector - SIMPLE VERSION
-console.log('[st-ext] Gmail injector active');
+console.log('[st-ext] Gmail injector active (frame URL:', window.location.href, ')');
 
 function addSnapButton() {
-  // Find all "Add to Drive" buttons
-  const attachButtons = document.querySelectorAll('div[data-tooltip="Add to Drive"]');
+  // Find attachment cards - Gmail uses multiple selectors
+  const attachButtons = document.querySelectorAll(`
+    div[data-tooltip="Add to Drive"],
+    span[data-tooltip="Add to Drive"],
+    div[aria-label="Add to Drive"],
+    span[aria-label="Add to Drive"],
+    div.aQw,
+    span.aZo N,
+    button.aQw
+  `);
   
   if (!attachButtons.length) {
-    console.log('[st-ext] No Add to Drive buttons found yet');
+    console.log('[st-ext] No attachment buttons found yet');
     return;
   }
 
-  console.log('[st-ext] Found', attachButtons.length, 'Add to Drive buttons');
+  console.log('[st-ext] Found', attachButtons.length, 'attachment buttons');
 
   attachButtons.forEach((btn) => {
     // Skip if we already added our button
-    if (btn.parentElement?.querySelector('.st-sign-btn')) {
+    if (btn.querySelector('.st-sign-btn') || btn.parentElement?.querySelector('.st-sign-btn')) {
       return;
     }
 
@@ -32,6 +40,7 @@ function addSnapButton() {
       cursor:pointer;
       font-size:12px;
       font-family:inherit;
+      display:inline-block;
     `;
 
     signBtn.addEventListener('click', (e) => {
@@ -40,8 +49,11 @@ function addSnapButton() {
       alert('Button working! (PDF step next)');
     });
 
-    btn.parentElement?.appendChild(signBtn);
-    console.log('[st-ext] Added Sign button');
+    // Try to append to the button or its parent
+    if (btn.parentElement) {
+      btn.parentElement.appendChild(signBtn);
+      console.log('[st-ext] Added Sign button next to attachment');
+    }
   });
 }
 

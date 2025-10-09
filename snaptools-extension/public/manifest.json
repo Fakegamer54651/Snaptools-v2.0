@@ -14,10 +14,10 @@
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["content/pdfBridge.js", "content/injector.js"],
-      "run_at": "document_start",
-      "type": "module",
-      "all_frames": true
+      "js": ["content/injector.js"],
+      "run_at": "document_idle",
+      "all_frames": true,
+      "match_about_blank": true
     }
   ],
   "web_accessible_resources": [
