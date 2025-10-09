@@ -1,8 +1,13 @@
 // Content script for SnapTools Minimal
+import { PDFViewer } from './pdfsign/viewer/pdfViewer';
+
 console.log('[st-ext] content script loaded successfully', window.location.href);
 
 // Track processed containers to avoid duplicates
 const processedContainers = new WeakSet<Element>();
+
+// Initialize PDF viewer instance
+const pdfViewer = new PDFViewer();
 
 // Gmail PDF sign button injection
 if (window.location.hostname === 'mail.google.com') {
@@ -66,11 +71,21 @@ function initPdfSignButtons() {
       btn.addEventListener('mouseleave', () => btn.style.background = '#f8f9fa');
 
       // Add click handler
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', async (e) => {
         e.preventDefault();
         e.stopPropagation();
         const fileName = getFileName(element);
         console.log(`[st-ext] Sign clicked for ${fileName}`);
+        
+        // Get PDF URL from Gmail
+        const pdfLink = element.closest('a') || element.querySelector('a');
+        if (pdfLink && pdfLink instanceof HTMLAnchorElement) {
+          const pdfUrl = pdfLink.href;
+          console.log(`[st-ext] Opening PDF viewer for: ${pdfUrl}`);
+          await pdfViewer.open(pdfUrl);
+        } else {
+          console.warn('[st-ext] Could not find PDF URL');
+        }
       });
 
       // Append it inline (next to the Drive button)
@@ -150,11 +165,21 @@ function initPdfSignButtons() {
         btn.addEventListener('mouseleave', () => btn.style.background = '#f8f9fa');
 
         // Add click handler
-        btn.addEventListener('click', (e) => {
+        btn.addEventListener('click', async (e) => {
           e.preventDefault();
           e.stopPropagation();
           const fileName = getFileName(element);
           console.log(`[st-ext] Sign clicked for ${fileName}`);
+          
+          // Get PDF URL from Gmail
+          const pdfLink = element.closest('a') || element.querySelector('a');
+          if (pdfLink && pdfLink instanceof HTMLAnchorElement) {
+            const pdfUrl = pdfLink.href;
+            console.log(`[st-ext] Opening PDF viewer for: ${pdfUrl}`);
+            await pdfViewer.open(pdfUrl);
+          } else {
+            console.warn('[st-ext] Could not find PDF URL');
+          }
         });
 
         // Append it inline (next to the Drive button)
