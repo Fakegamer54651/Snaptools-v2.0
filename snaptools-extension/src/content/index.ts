@@ -8,6 +8,10 @@ console.log('[st-ext] content script loaded successfully', window.location.href)
 const processedContainers = new WeakSet<Element>();
 const processedIframes = new WeakSet<HTMLIFrameElement>();
 
+// Throttle mechanism for observer callbacks
+let lastScanTime = 0;
+const SCAN_THROTTLE_MS = 3000; // 3 seconds
+
 // Temporarily disabled: PDF viewer instance
 // const pdfViewer = new PDFViewer();
 
@@ -20,14 +24,18 @@ if (window.location.hostname === 'mail.google.com') {
 function initPdfSignButtons() {
   console.log("[st-ext] PDF Sign injector active");
 
-  // Scan main document
+  // Initial scan
   scanDocumentForPDFs(document);
-
-  // Scan all iframes
   scanIframes();
 
-  // Set up global MutationObserver for new iframes and content
-  const globalObserver = new MutationObserver((mutations) => {
+  // Set up throttled global MutationObserver
+  const globalObserver = new MutationObserver(() => {
+    const now = Date.now();
+    if (now - lastScanTime < SCAN_THROTTLE_MS) {
+      return; // Skip if within throttle period
+    }
+    lastScanTime = now;
+
     scanDocumentForPDFs(document);
     scanIframes();
   });
@@ -61,8 +69,14 @@ function scanIframes() {
           // Scan for PDFs inside iframe
           scanDocumentForPDFs(iframeDoc);
 
-          // Watch for changes inside iframe
+          // Watch for changes inside iframe (throttled)
+          let lastIframeScanTime = 0;
           const iframeObserver = new MutationObserver(() => {
+            const now = Date.now();
+            if (now - lastIframeScanTime < SCAN_THROTTLE_MS) {
+              return;
+            }
+            lastIframeScanTime = now;
             scanDocumentForPDFs(iframeDoc);
           });
 
@@ -79,21 +93,19 @@ function scanIframes() {
 }
 
 function scanDocumentForPDFs(doc: Document) {
-  // Look for PDF links and attachments
+  // Look for PDF links and attachments with multiple selectors
   const pdfSelectors = [
     'a[href*=".pdf"]',
     'a[download*=".pdf"]',
     '[aria-label*=".pdf"]',
     '[data-tooltip*=".pdf"]',
     '[title*=".pdf"]',
+    'div[role="link"][data-tooltip*="Download"]',
+    '[aria-label*="Download"]',
   ];
 
   pdfSelectors.forEach(selector => {
     const elements = doc.querySelectorAll(selector);
-    
-    if (elements.length > 0) {
-      console.log(`[st-ext] Found ${elements.length} PDF elements with selector: ${selector}`);
-    }
 
     elements.forEach((element) => {
       processPDFElement(element, doc);
@@ -165,8 +177,15 @@ function injectSignButtonForContainer(container: Element, pdfElement: Element, d
 
   injectSignButton(actionBar, pdfElement, doc);
 
-  // Set up observer for this container
+  // Set up throttled observer for this container
+  let lastContainerScanTime = 0;
   const observer = new MutationObserver(() => {
+    const now = Date.now();
+    if (now - lastContainerScanTime < SCAN_THROTTLE_MS) {
+      return;
+    }
+    lastContainerScanTime = now;
+
     const actionBar = container.querySelector('.aQw');
     if (actionBar && !actionBar.querySelector('.st-sign-btn, [data-snaptools-sign="true"]')) {
       injectSignButton(actionBar, pdfElement, doc);
@@ -201,8 +220,8 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
     font-family: Google Sans, Roboto, Arial, sans-serif;
   `;
 
-  btn.addEventListener('mouseenter', () => btn.style.background = '#f1f3f4');
-  btn.addEventListener('mouseleave', () => btn.style.background = '#f8f9fa');
+  btn.addEventListener('mouseenter', () => btn.style.background = '#e8eaed');
+  btn.addEventListener('mouseleave', () => btn.style.background = '#f1f3f4');
 
   // Add click handler
   btn.addEventListener('click', (e) => {
@@ -211,21 +230,21 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
     
     console.log(`[st-ext] Sign button clicked for: ${fileName}`);
     
-    // Get PDF URL
+    // Get PDF URL with improved detection
     const pdfUrl = getPDFUrl(pdfElement);
     
     if (pdfUrl) {
-      console.log(`[st-ext] Opening popup for PDF: ${pdfUrl}`);
+      console.log(`[st-ext] Found PDF attachment: ${pdfUrl}`);
+      console.log(`[st-ext] Opening popup for PDF`);
       
       // Open popup window
       window.open(
-        chrome.runtime.getURL('popup/popup.html'),
+        chrome.runtime.getURL('popup/popup.html') + '?pdf=' + encodeURIComponent(pdfUrl),
         '_blank',
         'width=800,height=600,noopener,noreferrer'
       );
     } else {
-      console.warn('[st-ext] Could not find PDF URL');
-      alert('Could not find PDF URL. Please try downloading the file first.');
+      console.log('[st-ext] PDF link not found for this attachment.');
     }
   });
 
@@ -236,28 +255,72 @@ function injectSignButton(parent: Element, pdfElement: Element, doc: Document) {
 }
 
 function getPDFUrl(element: Element): string | null {
-  // Try href attribute
+  // Strategy 1: Direct href attribute
   const href = element.getAttribute('href');
   if (href && href.includes('.pdf')) {
     return href.startsWith('http') ? href : window.location.origin + href;
   }
 
-  // Try to find link in ancestors
+  // Strategy 2: Find closest <a> tag
   const link = element.closest('a');
-  if (link && link instanceof HTMLAnchorElement) {
-    return link.href;
+  if (link && link instanceof HTMLAnchorElement && link.href) {
+    if (link.href.includes('.pdf') || link.download) {
+      return link.href;
+    }
   }
 
-  // Try to find link in children
-  const childLink = element.querySelector('a[href*=".pdf"]');
+  // Strategy 3: Find <a> in children
+  const childLink = element.querySelector('a[href*=".pdf"], a[download]');
   if (childLink && childLink instanceof HTMLAnchorElement) {
     return childLink.href;
   }
 
-  // Try data attributes
-  const dataUrl = element.getAttribute('data-url') || element.getAttribute('data-href');
+  // Strategy 4: Check parent for download link
+  const parent = element.parentElement;
+  if (parent) {
+    const parentLink = parent.querySelector('a[href*=".pdf"], a[download]');
+    if (parentLink && parentLink instanceof HTMLAnchorElement) {
+      return parentLink.href;
+    }
+  }
+
+  // Strategy 5: Look for data attributes
+  const dataUrl = element.getAttribute('data-url') 
+    || element.getAttribute('data-href')
+    || element.getAttribute('data-download-url');
   if (dataUrl && dataUrl.includes('.pdf')) {
     return dataUrl;
+  }
+
+  // Strategy 6: Check for Gmail-specific attachment links in container
+  const container = element.closest('div[role="group"], div.aQH, div.aZo');
+  if (container) {
+    const downloadLink = container.querySelector('a[href*="mail.google.com"][href*="view=att"]');
+    if (downloadLink && downloadLink instanceof HTMLAnchorElement) {
+      return downloadLink.href;
+    }
+
+    // Check for any link that might be a download
+    const anyLink = container.querySelector('a[aria-label*="Download"], a[data-tooltip*="Download"]');
+    if (anyLink && anyLink instanceof HTMLAnchorElement && anyLink.href) {
+      return anyLink.href;
+    }
+  }
+
+  // Strategy 7: Look in siblings
+  if (element.parentElement) {
+    const siblings = Array.from(element.parentElement.children);
+    for (const sibling of siblings) {
+      if (sibling instanceof HTMLAnchorElement && sibling.href) {
+        if (sibling.href.includes('.pdf') || sibling.download) {
+          return sibling.href;
+        }
+      }
+      const nestedLink = sibling.querySelector('a[href*=".pdf"], a[download]');
+      if (nestedLink && nestedLink instanceof HTMLAnchorElement) {
+        return nestedLink.href;
+      }
+    }
   }
 
   return null;
