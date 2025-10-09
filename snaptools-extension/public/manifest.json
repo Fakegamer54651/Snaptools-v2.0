@@ -3,33 +3,34 @@
   "name": "SnapTools Minimal",
   "version": "2.0.0",
   "description": "Lightweight SnapTools Gmail helper",
-  "permissions": ["storage"],
+  "permissions": ["storage", "windows", "tabs"],
   "host_permissions": [
     "https://mail.google.com/*",
     "https://*.googleusercontent.com/*",
     "https://cdnjs.cloudflare.com/*"
   ],
-  "content_security_policy": {
-    "extension_pages": "script-src 'self'; object-src 'self';"
-  },
   "background": {
     "service_worker": "background/index.js"
   },
   "content_scripts": [
     {
       "matches": ["https://mail.google.com/*"],
-      "js": ["content/index.js"],
+      "js": ["content/injector.js"],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
-  "action": {
-    "default_popup": "popup/popup.html"
-  },
   "web_accessible_resources": [
     {
-      "resources": ["*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "viewer/*",
+        "vendor/*",
+        "content/pdfsign/*"
+      ],
+      "matches": ["https://mail.google.com/*"]
     }
-  ]
+  ],
+  "action": {
+    "default_popup": "popup/popup.html"
+  }
 }

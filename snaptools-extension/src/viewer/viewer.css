@@ -1,0 +1,100 @@
+/* SnapTools PDF Viewer Styles */
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.title {
+  font-weight: 500;
+  color: #202124;
+  font-size: 14px;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.toolbar button {
+  background: #f1f3f4;
+  border: 1px solid #dadce0;
+  border-radius: 4px;
+  padding: 6px 12px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #202124;
+  min-width: 32px;
+}
+
+.toolbar button:hover {
+  background: #e8eaed;
+}
+
+.toolbar button:active {
+  background: #dadce0;
+}
+
+#zoomLevel {
+  font-size: 13px;
+  color: #5f6368;
+  min-width: 50px;
+  text-align: center;
+}
+
+#pages {
+  flex: 1;
+  overflow: auto;
+  background: #f5f5f5;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.page-container {
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 16px;
+}
+
+canvas {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.error {
+  background: #fef7e0;
+  border: 1px solid #f9ab00;
+  border-radius: 4px;
+  padding: 16px;
+  margin: 16px;
+  color: #202124;
+}
+
+.error-title {
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
