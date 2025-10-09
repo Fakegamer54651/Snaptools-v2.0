@@ -26,9 +26,10 @@
       "resources": [
         "viewer/*",
         "vendor/*",
-        "content/pdfsign/*"
+        "content/pdfsign/*",
+        "content/pdfsign/overlayViewer.js"
       ],
-      "matches": ["https://mail.google.com/*"]
+      "matches": ["<all_urls>"]
     }
   ],
   "action": {

@@ -1,8 +1,6 @@
 // Gmail Sign button injector
 // Logs: Gmail tab → Chrome Console: [st-ext] …
 
-import { openOverlayViewer } from './pdfsign/overlayViewer.js';
-
 console.log('[st-ext] Gmail injector active');
 
 // Track processed elements
@@ -16,28 +14,33 @@ const SCAN_THROTTLE_MS = 3000;
 if (window.location.hostname === 'mail.google.com') {
   console.log('[st-ext] Gmail detected, starting injection');
   
-  // Initial scan
-  scan();
-  
-  // Set up throttled observer
-  const observer = new MutationObserver(() => {
-    const now = Date.now();
-    if (now - lastScanTime < SCAN_THROTTLE_MS) {
-      return; // Skip if within throttle period
-    }
-    lastScanTime = now;
-    scan();
-  });
-  
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  // Load overlay viewer dynamically
+  (async () => {
+    const { openOverlayViewer } = await import(chrome.runtime.getURL('content/pdfsign/overlayViewer.js'));
+    
+    // Initial scan
+    scan(openOverlayViewer);
+    
+    // Set up throttled observer
+    const observer = new MutationObserver(() => {
+      const now = Date.now();
+      if (now - lastScanTime < SCAN_THROTTLE_MS) {
+        return; // Skip if within throttle period
+      }
+      lastScanTime = now;
+      scan(openOverlayViewer);
+    });
+    
+    observer.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+  })();
 }
 
-function scan() {
+function scan(openOverlayViewer: any) {
   // Scan main document
-  scanRoot(document);
+  scanRoot(document, openOverlayViewer);
   
   // Scan all iframes
   const iframes = document.querySelectorAll('iframe');
@@ -45,7 +48,7 @@ function scan() {
     try {
       const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
       if (iframeDoc?.body) {
-        scanRoot(iframeDoc);
+        scanRoot(iframeDoc, openOverlayViewer);
       }
     } catch (e) {
       // Cross-origin iframe, skip
@@ -53,7 +56,7 @@ function scan() {
   });
 }
 
-function scanRoot(root: Document) {
+function scanRoot(root: Document, openOverlayViewer: any) {
   // Find all action bars (Gmail attachment toolbar)
   const bars = root.querySelectorAll('.aQw');
   
@@ -118,4 +121,3 @@ function scanRoot(root: Document) {
     console.log('[st-ext] Added Sign button next to Add to Drive', filename);
   });
 }
-
