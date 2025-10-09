@@ -1,123 +1,54 @@
-// Gmail Sign button injector
-// Logs: Gmail tab → Chrome Console: [st-ext] …
-
+// Gmail Sign button injector - SIMPLE VERSION
 console.log('[st-ext] Gmail injector active');
 
-// Track processed elements
-const processed = new WeakSet<Element>();
-
-// Throttle mechanism
-let lastScanTime = 0;
-const SCAN_THROTTLE_MS = 3000;
-
-// Initialize if on Gmail
-if (window.location.hostname === 'mail.google.com') {
-  console.log('[st-ext] Gmail detected, starting injection');
+function addSnapButton() {
+  // Find all "Add to Drive" buttons
+  const attachButtons = document.querySelectorAll('div[data-tooltip="Add to Drive"]');
   
-  // Load overlay viewer dynamically
-  (async () => {
-    const { openOverlayViewer } = await import(chrome.runtime.getURL('content/pdfsign/overlayViewer.js'));
-    
-    // Initial scan
-    scan(openOverlayViewer);
-    
-    // Set up throttled observer
-    const observer = new MutationObserver(() => {
-      const now = Date.now();
-      if (now - lastScanTime < SCAN_THROTTLE_MS) {
-        return; // Skip if within throttle period
-      }
-      lastScanTime = now;
-      scan(openOverlayViewer);
-    });
-    
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
-  })();
-}
+  if (!attachButtons.length) {
+    console.log('[st-ext] No Add to Drive buttons found yet');
+    return;
+  }
 
-function scan(openOverlayViewer: any) {
-  // Scan main document
-  scanRoot(document, openOverlayViewer);
-  
-  // Scan all iframes
-  const iframes = document.querySelectorAll('iframe');
-  iframes.forEach((iframe) => {
-    try {
-      const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (iframeDoc?.body) {
-        scanRoot(iframeDoc, openOverlayViewer);
-      }
-    } catch (e) {
-      // Cross-origin iframe, skip
-    }
-  });
-}
+  console.log('[st-ext] Found', attachButtons.length, 'Add to Drive buttons');
 
-function scanRoot(root: Document, openOverlayViewer: any) {
-  // Find all action bars (Gmail attachment toolbar)
-  const bars = root.querySelectorAll('.aQw');
-  
-  bars.forEach((bar) => {
-    // Skip if already has our button
-    if (bar.querySelector('[data-st-sign-btn]')) {
+  attachButtons.forEach((btn) => {
+    // Skip if we already added our button
+    if (btn.parentElement?.querySelector('.st-sign-btn')) {
       return;
     }
-    
-    // Skip if already processed (belt and suspenders)
-    if (processed.has(bar)) {
-      return;
-    }
-    
-    processed.add(bar);
-    
-    // Try to find filename from nearby elements
-    const container = bar.closest('div[role="group"], div.aQH, div.aZo, div[role="button"]');
-    const filenameElement = container?.querySelector('[aria-label$=".pdf"], [data-tooltip$=".pdf"]');
-    const filename = (
-      filenameElement?.getAttribute('aria-label') ||
-      filenameElement?.getAttribute('data-tooltip') ||
-      container?.textContent?.match(/([^\\/]+\.pdf)/i)?.[1] ||
-      ''
-    ).trim();
-    
-    // Try to extract URL from nearby link
-    const linkElement = container?.querySelector('a[href*=".pdf"], a[href*="googleusercontent.com"]') as HTMLAnchorElement | null;
-    const url = linkElement?.href || '';
-    
-    // Create button
-    const btn = root.createElement('button');
-    btn.textContent = 'Sign';
-    btn.dataset.stSignBtn = '1';
-    btn.style.cssText = 'background:#f1f3f4;border:1px solid #dadce0;border-radius:4px;padding:2px 8px;margin-left:6px;font-size:12px;cursor:pointer;';
-    
-    // Add hover effect
-    btn.addEventListener('mouseenter', () => {
-      btn.style.background = '#e8eaed';
-    });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.background = '#f1f3f4';
-    });
-    
-    // Click handler
-    btn.addEventListener('click', async (e) => {
-      e.preventDefault();
+
+    // Create Sign button
+    const signBtn = document.createElement('button');
+    signBtn.textContent = 'Sign';
+    signBtn.className = 'st-sign-btn';
+    signBtn.style.cssText = `
+      background:#ff510e;
+      color:#fff;
+      border:none;
+      border-radius:6px;
+      padding:4px 10px;
+      margin-left:6px;
+      cursor:pointer;
+      font-size:12px;
+      font-family:inherit;
+    `;
+
+    signBtn.addEventListener('click', (e) => {
       e.stopPropagation();
-      
-      console.log('[st-ext] Sign click', { filename, hasUrl: !!url });
-      
-      try {
-        await openOverlayViewer({ src: url, name: filename || 'document.pdf' });
-      } catch (error) {
-        console.log('[st-ext] viewer open failed', error);
-      }
+      console.log('[st-ext] Sign button clicked!');
+      alert('Button working! (PDF step next)');
     });
-    
-    // Append button to action bar
-    bar.appendChild(btn);
-    
-    console.log('[st-ext] Added Sign button next to Add to Drive', filename);
+
+    btn.parentElement?.appendChild(signBtn);
+    console.log('[st-ext] Added Sign button');
   });
 }
+
+// Run every 2 seconds to catch Gmail's dynamic content
+setInterval(addSnapButton, 2000);
+
+// Run immediately
+addSnapButton();
+
+console.log('[st-ext] Gmail injector running - checking every 2s');
