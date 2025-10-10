@@ -111,9 +111,10 @@ canvas {
 // Safe script loader with extension context validation
 function loadScriptWithCheck(srcUrl: string, hostElement: HTMLElement, timeoutMs = 7000): Promise<void> {
   return new Promise((resolve, reject) => {
-    // if host is gone -> reject
+    // if host is gone -> reattach to top-level body
     if (!hostElement || !document.body.contains(hostElement)) {
-      return reject(new Error('Extension context invalidated: host not in DOM'));
+      console.warn('[st-view] host moved during script load; re-attaching');
+      (window.top?.document?.body || document.body).appendChild(hostElement);
     }
 
     const script = document.createElement('script');
@@ -121,10 +122,10 @@ function loadScriptWithCheck(srcUrl: string, hostElement: HTMLElement, timeoutMs
     script.defer = true;
 
     const onLoad = () => {
-      // verify host still exists after load
+      // verify host still exists after load, reattach if needed
       if (!document.body.contains(hostElement)) {
-        cleanup();
-        return reject(new Error('Extension context invalidated after script load'));
+        console.warn('[st-view] host moved after script load; re-attaching');
+        (window.top?.document?.body || document.body).appendChild(hostElement);
       }
       cleanup();
       resolve();
@@ -172,6 +173,26 @@ async function loadPDFjsIntoPage(hostElement: HTMLElement): Promise<any> {
   return pdfjsLib;
 }
 
+// Create overlay host anchored to top-level document body
+function openOverlayHost(): HTMLDivElement {
+  let host = document.getElementById(HOST_ID) as HTMLDivElement;
+  if (host) return host;
+
+  host = document.createElement('div');
+  host.id = HOST_ID;
+  host.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 2147483647;
+    background: rgba(0,0,0,0.35);
+  `;
+
+  // attach to the *root document body*, not the iframe body
+  (window.top?.document?.body || document.body).appendChild(host);
+  console.log('[st-view] overlay host created on top-level body');
+  return host;
+}
+
 export async function openOverlayViewer(options: { src?: string; name?: string } = {}): Promise<void> {
   const { src, name } = options;
 
@@ -181,22 +202,18 @@ export async function openOverlayViewer(options: { src?: string; name?: string }
     return;
   }
 
-  // Reuse or create host
-  if (!currentHost) {
-    currentHost = document.createElement('div');
-    currentHost.id = HOST_ID;
-    document.documentElement.appendChild(currentHost);
+  // Create host anchored to top-level body
+  currentHost = openOverlayHost();
 
-    // Attach shadow root
-    shadowRoot = currentHost.attachShadow({ mode: 'open' });
+  // Attach shadow root
+  shadowRoot = currentHost.attachShadow({ mode: 'open' });
 
-    // Inject CSS
-    const style = document.createElement('style');
-    style.textContent = cssContent;
-    shadowRoot.appendChild(style);
+  // Inject CSS
+  const style = document.createElement('style');
+  style.textContent = cssContent;
+  shadowRoot.appendChild(style);
 
-    console.log('[st-view] overlay mounted');
-  }
+  console.log('[st-view] overlay mounted');
 
   if (!shadowRoot) return;
 
@@ -265,9 +282,8 @@ export async function openOverlayViewer(options: { src?: string; name?: string }
   await new Promise(r => setTimeout(r, 100)); // small delay lets Gmail settle
   
   if (!document.body.contains(host)) {
-    console.warn('[st-view] host detached before load, recreating');
-    closeOverlayViewer();
-    return;
+    console.warn('[st-view] host moved; re-attaching to top-level body');
+    (window.top?.document?.body || document.body).appendChild(host);
   }
 
   // Load PDF.js safely with context validation
