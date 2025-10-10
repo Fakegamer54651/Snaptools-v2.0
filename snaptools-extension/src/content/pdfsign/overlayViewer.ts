@@ -260,12 +260,26 @@ export async function openOverlayViewer(options: { src?: string; name?: string }
     }
   });
 
+  // Validate and pin the host before loading PDF.js
+  const host = currentHost;
+  await new Promise(r => setTimeout(r, 100)); // small delay lets Gmail settle
+  
+  if (!document.body.contains(host)) {
+    console.warn('[st-view] host detached before load, recreating');
+    closeOverlayViewer();
+    return;
+  }
+
   // Load PDF.js safely with context validation
   try {
-    pdfjsLib = await loadPDFjsIntoPage(currentHost);
+    pdfjsLib = await loadPDFjsIntoPage(host);
   } catch (error) {
     console.error('[st-view] Failed to load PDF.js:', error);
-    pagesContainer.innerHTML = '<div style="color: #d93025; padding: 20px;">Failed to load PDF.js library</div>';
+    if ((error as Error).message.includes('invalidated')) {
+      alert('Gmail refreshed this view before the PDF finished loading. Try again.');
+    } else {
+      pagesContainer.innerHTML = '<div style="color: #d93025; padding: 20px;">Failed to load PDF.js library</div>';
+    }
     return;
   }
 

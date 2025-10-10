@@ -3,13 +3,22 @@
 
 console.log('[st-ext] Gmail injector active');
 
-// Robust filename parsing - strip "Download attachment" prefix
-function normalizeFilename(raw: string): string {
-  if (!raw) return '';
-  // Remove "Download attachment " prefix users saw
+// Clean filename extraction - get just the PDF name without Gmail noise
+function getCleanFilename(card: Element): string {
+  // First try to find the specific filename element
+  const nameEl = card.querySelector('[aria-label$=".pdf"], [data-tooltip$=".pdf"], span[title$=".pdf"]');
+  if (nameEl) {
+    return nameEl.getAttribute('aria-label') || 
+           nameEl.getAttribute('data-tooltip') || 
+           nameEl.getAttribute('title') || '';
+  }
+  
+  // Fallback: clean up the raw text content
+  const raw = (card.textContent || '').trim();
   return raw
-    .replace(/^Download attachment\s*/i, '')   // strip Gmail prefix
-    .replace(/\s*[\(\)\[\]]+$/, '')           // trim trailing parens/brackets if any
+    .replace(/^Preview attachment\s*/i, '')
+    .replace(/^Download attachment\s*/i, '')
+    .replace(/\s*(Download|Add to Drive|Edit with).*$/i, '')
     .trim();
 }
 
@@ -120,9 +129,8 @@ function scanRoot(root: Document, openOverlayViewer: any) {
     const container = bar.closest('div[role="group"], div.aQH, div.aZo, div[role="button"]');
     if (!container) return;
     
-    // Extract filename using robust parsing
-    const raw = (container as HTMLElement).innerText || container.textContent || '';
-    const filename = normalizeFilename(raw);
+    // Extract clean filename
+    const filename = getCleanFilename(container);
     
     console.log('[st-ext] filename:', filename);
     
