@@ -24,13 +24,16 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "content/pdfsign/pdf.min.js",
         "content/pdfsign/overlayViewer.js",
+        "content/pdfsign/pdf.worker.min.js",
         "vendor/pdf.min.js",
-        "vendor/pdf.worker.min.js",
-        "content/pdfsign/*",
-        "viewer/*"
+        "vendor/pdf.worker.min.js"
       ],
-      "matches": ["https://mail.google.com/*"]
+      "matches": [
+        "https://mail.google.com/*",
+        "https://*.googleusercontent.com/*"
+      ]
     }
   ],
   "action": {
