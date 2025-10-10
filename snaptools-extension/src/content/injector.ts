@@ -3,6 +3,49 @@
 
 console.log('[st-ext] Gmail injector active');
 
+// Robust filename parsing - strip "Download attachment" prefix
+function normalizeFilename(raw: string): string {
+  if (!raw) return '';
+  // Remove "Download attachment " prefix users saw
+  return raw
+    .replace(/^Download attachment\s*/i, '')   // strip Gmail prefix
+    .replace(/\s*[\(\)\[\]]+$/, '')           // trim trailing parens/brackets if any
+    .trim();
+}
+
+// Extract PDF URL with multiple fallback strategies
+async function findPdfUrlFromCard(cardRoot: Element): Promise<string | null> {
+  // 1) Look for an anchor with a .pdf in href
+  const anchors = Array.from(cardRoot.querySelectorAll('a[href]'));
+  for (const a of anchors) {
+    const href = a.getAttribute('href') || '';
+    if (/\.pdf(?:[?#]|$)/i.test(href)) return href;
+  }
+
+  // 2) Look for elements that Gmail uses: attribute 'download_url' or dataset
+  const elWithDownload = cardRoot.querySelector('[download_url], [data-download-url], [data-downloadurl]');
+  if (elWithDownload) {
+    const raw = elWithDownload.getAttribute('download_url') 
+             || elWithDownload.getAttribute('data-download-url')
+             || elWithDownload.getAttribute('data-downloadurl') 
+             || (elWithDownload as any).dataset?.downloadUrl;
+    if (raw) {
+      // gmail sometimes stores "application/pdf:Name.pdf:https://mail.google.com/..." style
+      const maybeUrl = raw.split(':').slice(-1)[0];
+      if (maybeUrl && maybeUrl.startsWith('http')) return maybeUrl;
+    }
+  }
+
+  // 3) Look for a direct download button (SVG/button), try to find href inside
+  const downloadButton = cardRoot.querySelector('a[role="link"][href*="view=att"], a[download]');
+  if (downloadButton && (downloadButton as HTMLAnchorElement).href) {
+    return (downloadButton as HTMLAnchorElement).href;
+  }
+
+  // 4) fail: return null so caller can show "download first" message
+  return null;
+}
+
 // Track processed elements
 const processed = new WeakSet<Element>();
 
@@ -73,19 +116,15 @@ function scanRoot(root: Document, openOverlayViewer: any) {
     
     processed.add(bar);
     
-    // Try to find filename from nearby elements
+    // Find attachment container
     const container = bar.closest('div[role="group"], div.aQH, div.aZo, div[role="button"]');
-    const filenameElement = container?.querySelector('[aria-label$=".pdf"], [data-tooltip$=".pdf"]');
-    const filename = (
-      filenameElement?.getAttribute('aria-label') ||
-      filenameElement?.getAttribute('data-tooltip') ||
-      container?.textContent?.match(/([^\\/]+\.pdf)/i)?.[1] ||
-      ''
-    ).trim();
+    if (!container) return;
     
-    // Try to extract URL from nearby link
-    const linkElement = container?.querySelector('a[href*=".pdf"], a[href*="googleusercontent.com"]') as HTMLAnchorElement | null;
-    const url = linkElement?.href || '';
+    // Extract filename using robust parsing
+    const raw = (container as HTMLElement).innerText || container.textContent || '';
+    const filename = normalizeFilename(raw);
+    
+    console.log('[st-ext] filename:', filename);
     
     // Create button
     const btn = root.createElement('button');
@@ -106,12 +145,21 @@ function scanRoot(root: Document, openOverlayViewer: any) {
       e.preventDefault();
       e.stopPropagation();
       
-      console.log('[st-ext] Sign click', { filename, hasUrl: !!url });
+      console.log('[st-ext] Sign click', { filename });
       
       try {
+        // Extract PDF URL with fallback strategies
+        const url = await findPdfUrlFromCard(container);
+        if (!url) {
+          alert('Could not find direct PDF URL. Please click the Gmail download icon once and try again.');
+          return;
+        }
+        
+        console.log('[st-ext] Found PDF URL:', url);
         await openOverlayViewer({ src: url, name: filename || 'document.pdf' });
       } catch (error) {
         console.log('[st-ext] viewer open failed', error);
+        alert('Failed to open PDF viewer: ' + (error as Error).message);
       }
     });
     

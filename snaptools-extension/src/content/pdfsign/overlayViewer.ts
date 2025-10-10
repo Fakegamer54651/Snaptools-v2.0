@@ -108,56 +108,68 @@ canvas {
 }
 `;
 
-async function loadPDFJS(): Promise<any> {
-  if ((window as any).pdfjsLib) {
-    console.log('[st-view] PDF.js already loaded');
-    return (window as any).pdfjsLib;
+// Safe script loader with extension context validation
+function loadScriptWithCheck(srcUrl: string, hostElement: HTMLElement, timeoutMs = 7000): Promise<void> {
+  return new Promise((resolve, reject) => {
+    // if host is gone -> reject
+    if (!hostElement || !document.body.contains(hostElement)) {
+      return reject(new Error('Extension context invalidated: host not in DOM'));
+    }
+
+    const script = document.createElement('script');
+    script.src = srcUrl;
+    script.defer = true;
+
+    const onLoad = () => {
+      // verify host still exists after load
+      if (!document.body.contains(hostElement)) {
+        cleanup();
+        return reject(new Error('Extension context invalidated after script load'));
+      }
+      cleanup();
+      resolve();
+    };
+    const onError = (e: any) => {
+      cleanup();
+      reject(new Error(`Failed to load script ${srcUrl}`));
+    };
+
+    function cleanup() {
+      script.removeEventListener('load', onLoad);
+      script.removeEventListener('error', onError);
+      clearTimeout(timeoutId);
+    }
+    script.addEventListener('load', onLoad);
+    script.addEventListener('error', onError);
+    document.head.appendChild(script);
+
+    const timeoutId = setTimeout(() => {
+      cleanup();
+      reject(new Error('loadScriptWithCheck timeout'));
+    }, timeoutMs);
+  });
+}
+
+async function loadPDFjsIntoPage(hostElement: HTMLElement): Promise<any> {
+  // Use extension URL (works even in content scripts)
+  const pdfUrl = chrome.runtime.getURL('vendor/pdf.min.js');
+  const workerUrl = chrome.runtime.getURL('vendor/pdf.worker.min.js');
+
+  await loadScriptWithCheck(pdfUrl, hostElement);
+
+  // after script is loaded, pdfjs creates global (varies by build). guard:
+  const lib = (window as any).pdfjsLib || (window as any).pdfjsDist?.build?.pdf;
+  if (!lib && !(window as any).pdfjsLib) {
+    throw new Error('PDF.js not available after script load');
   }
 
-  const url = chrome.runtime.getURL('vendor/pdf.min.js');
-  console.log('[st-view] Attempting to load PDF.js from', url);
+  // configure worker
+  const pdfjsLib = (window as any).pdfjsLib || ((window as any).pdfjsDist && (window as any).pdfjsDist.build && (window as any).pdfjsDist.build.pdf);
+  if (pdfjsLib && pdfjsLib.GlobalWorkerOptions) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+  }
 
-  return new Promise((resolve, reject) => {
-    const script = document.createElement('script');
-    script.src = url;
-    script.async = false;
-
-    script.onload = () => {
-      // Bridge PDF.js from page world to extension world
-      const bridge = document.createElement('script');
-      bridge.textContent = `
-        (() => {
-          const lib = window.pdfjsLib || window['pdfjs-dist/build/pdf'];
-          if (lib) {
-            window.pdfjsLib = lib;
-            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: true } }));
-          } else {
-            document.dispatchEvent(new CustomEvent('__st_pdfjs_ready', { detail: { ok: false } }));
-          }
-        })();
-      `;
-      document.documentElement.appendChild(bridge);
-      bridge.remove();
-
-      document.addEventListener('__st_pdfjs_ready', (e: any) => {
-        if (!e.detail.ok) {
-          console.error('[st-view] PDF.js bridge failed');
-          reject(new Error('PDF.js not available after bridge'));
-          return;
-        }
-        const lib = (window as any).pdfjsLib;
-        lib.GlobalWorkerOptions.workerSrc = chrome.runtime.getURL('vendor/pdf.worker.min.js');
-        console.log('[st-view] PDF.js loaded successfully ✅');
-        resolve(lib);
-      }, { once: true });
-    };
-
-    script.onerror = (err: any) => {
-      reject(new Error(`Failed to load PDF.js: ${err.message || err}`));
-    };
-
-    document.head.appendChild(script);
-  });
+  return pdfjsLib;
 }
 
 export async function openOverlayViewer(options: { src?: string; name?: string } = {}): Promise<void> {
@@ -248,9 +260,9 @@ export async function openOverlayViewer(options: { src?: string; name?: string }
     }
   });
 
-  // Load PDF.js
+  // Load PDF.js safely with context validation
   try {
-    await loadPDFJS();
+    pdfjsLib = await loadPDFjsIntoPage(currentHost);
   } catch (error) {
     console.error('[st-view] Failed to load PDF.js:', error);
     pagesContainer.innerHTML = '<div style="color: #d93025; padding: 20px;">Failed to load PDF.js library</div>';
