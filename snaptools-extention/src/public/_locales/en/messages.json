@@ -1,0 +1,55 @@
+{
+  "extName": {
+    "message": "SnapTools Extension",
+    "description": "Name of the extension"
+  },
+  "extDescription": {
+    "message": "Shortcuts, templates, and PDF tools for Gmail/Outlook/DAT/Truckstop",
+    "description": "Description of the extension"
+  },
+  "popupTitle": {
+    "message": "SnapTools",
+    "description": "Title shown in the popup"
+  },
+  "signIn": {
+    "message": "Sign In",
+    "description": "Sign in button text"
+  },
+  "signOut": {
+    "message": "Sign Out",
+    "description": "Sign out button text"
+  },
+  "settings": {
+    "message": "Settings",
+    "description": "Settings link text"
+  },
+  "shortcuts": {
+    "message": "Shortcuts",
+    "description": "Shortcuts section title"
+  },
+  "templates": {
+    "message": "Templates",
+    "description": "Templates section title"
+  },
+  "noShortcuts": {
+    "message": "No shortcuts configured",
+    "description": "Empty state for shortcuts"
+  },
+  "noTemplates": {
+    "message": "No templates available",
+    "description": "Empty state for templates"
+  },
+  "statusActive": {
+    "message": "Active",
+    "description": "Active status badge"
+  },
+  "statusInactive": {
+    "message": "Inactive",
+    "description": "Inactive status badge"
+  },
+  "statusSyncing": {
+    "message": "Syncing",
+    "description": "Syncing status badge"
+  }
+}
+

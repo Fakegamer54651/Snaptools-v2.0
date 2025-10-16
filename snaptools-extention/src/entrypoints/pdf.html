@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SnapTools PDF Signer</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    .header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      color: #202124;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1a73e8;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1557b0;
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #5f6368;
+      border: 1px solid #dadce0;
+    }
+
+    .btn-secondary:hover {
+      background: #f8f9fa;
+    }
+
+    .content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .placeholder {
+      text-align: center;
+      color: #5f6368;
+      max-width: 500px;
+    }
+
+    .placeholder h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+      color: #202124;
+    }
+
+    .placeholder p {
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+    }
+
+    .pdf-url {
+      background: #f1f3f4;
+      padding: 12px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 12px;
+      color: #202124;
+      word-break: break-all;
+      margin-top: 16px;
+    }
+
+    .loader {
+      text-align: center;
+      padding: 40px;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid #e0e0e0;
+      border-top: 3px solid #1a73e8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📄 SnapTools PDF Signer</h1>
+    <div class="header-actions">
+      <button class="btn btn-secondary" id="closeBtn">Cancel</button>
+      <button class="btn btn-primary" id="signBtn" disabled>Sign PDF</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="placeholder" id="placeholder">
+      <h2>PDF Signer Ready</h2>
+      <p>
+        This is the SnapTools PDF signing interface. 
+        PDF viewer and signature placement tools will be implemented here.
+      </p>
+      <div id="pdfInfo"></div>
+    </div>
+  </div>
+
+  <script>
+    // Get PDF URL from query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const pdfUrl = urlParams.get('file');
+
+    const pdfInfo = document.getElementById('pdfInfo');
+    
+    if (pdfUrl) {
+      pdfInfo.innerHTML = `
+        <p><strong>PDF URL:</strong></p>
+        <div class="pdf-url">${pdfUrl}</div>
+        <p style="margin-top: 16px; color: #80868b; font-size: 13px;">
+          TODO: Load PDF viewer, add signature placement tools
+        </p>
+      `;
+      document.getElementById('signBtn').disabled = false;
+    } else {
+      pdfInfo.innerHTML = `
+        <p style="color: #ea4335;">No PDF URL provided</p>
+      `;
+    }
+
+    // Close button
+    document.getElementById('closeBtn').addEventListener('click', () => {
+      window.parent.postMessage({ type: 'CLOSE_MODAL' }, '*');
+    });
+
+    // Sign button (placeholder)
+    document.getElementById('signBtn').addEventListener('click', () => {
+      console.log('[SnapTools PDF] Sign button clicked');
+      alert('PDF signing UI will be implemented here.\n\nThis will include:\n- PDF viewer\n- Signature placement\n- Save/download signed PDF');
+    });
+
+    console.log('[SnapTools PDF] PDF viewer loaded with URL:', pdfUrl);
+  </script>
+</body>
+</html>
+
