@@ -1,8 +1,8 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.mjs";
 import * as fabric from "fabric";
-import { Canvas, Textbox } from "fabric";
+import { Canvas, Textbox, FabricImage } from "fabric";
 import { PDFDocument } from "pdf-lib";
 import "./styles/pdfsign.css";
 
@@ -10,13 +10,34 @@ export default function PDFSignPage() {
   const fileInputRef = useRef(null);
   const containerRef = useRef(null);
   const [fabricCanvases, setFabricCanvases] = useState([]);
-  const [showSignModal, setShowSignModal] = useState(false);
-  const [signName, setSignName] = useState(
-    localStorage.getItem("snaptoolsSignName") || ""
-  );
-  const [tempName, setTempName] = useState("");
   const [isPlacing, setIsPlacing] = useState(false);
   const [placementWarning, setPlacementWarning] = useState(false);
+
+  // Dropdown & modals
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [showFontModal, setShowFontModal] = useState(false);
+  const [showDrawModal, setShowDrawModal] = useState(false);
+
+  // Signature storage
+  const [savedSigns, setSavedSigns] = useState([]);
+  const [tempSignName, setTempSignName] = useState("");
+  const [activeFont, setActiveFont] = useState("cursive");
+
+  // Draw sign refs
+  const drawCanvasRef = useRef(null);
+  const drawCtxRef = useRef(null);
+  const [drawing, setDrawing] = useState(false);
+
+  // Load saved signatures
+  useEffect(() => {
+    const local = JSON.parse(localStorage.getItem("snaptoolsSavedSigns") || "[]");
+    setSavedSigns(local);
+  }, []);
+
+  const saveSignsToLocal = (list) => {
+    localStorage.setItem("snaptoolsSavedSigns", JSON.stringify(list));
+    setSavedSigns(list);
+  };
 
   const handleUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -268,35 +289,152 @@ export default function PDFSignPage() {
     startPlacementMode(date);
   };
 
-  // Handle sign button click
-  const handleSignClick = () => {
-    if (!signName) {
-      setShowSignModal(true);
-    } else {
-      addSignToCanvas(signName);
-    }
+  // ===========================
+  // CREATE FONT SIGN
+  // ===========================
+  const handleSaveFontSign = () => {
+    if (!tempSignName.trim()) return;
+    const newSign = {
+      id: Date.now(),
+      type: "font",
+      name: tempSignName,
+      fontFamily: activeFont,
+    };
+    const updated = [newSign, ...savedSigns].slice(0, 3);
+    saveSignsToLocal(updated);
+    setTempSignName("");
+    setShowFontModal(false);
   };
 
-  // Save signature name
-  const saveSignName = () => {
-    if (!tempName.trim()) return;
-    setSignName(tempName);
-    localStorage.setItem("snaptoolsSignName", tempName);
-    setShowSignModal(false);
-    setTempName("");
-  };
-
-  // Place sign on canvas (click-to-place)
-  const addSignToCanvas = (name) => {
+  const handleAddFontSign = (sign) => {
     if (!fabricCanvases.length) return;
-    const sign = new Textbox(name, {
-      fontSize: 28,
+    const text = new fabric.Text(sign.name, {
+      fontFamily: sign.fontFamily,
+      fontSize: 36,
       fill: "#000",
       fontStyle: "italic",
+      textAlign: "left",
+      originX: "left",
+      originY: "top",
+      splitByGrapheme: false,
         selectable: true,
-      fontFamily: "cursive",
+      });
+    // Prevent line wrapping
+    text.set({ width: text.width + 10 });
+    
+    // Scale down if too wide for page
+    if (text.width > 700) {
+      const scaleFactor = 700 / text.width;
+      text.scale(scaleFactor);
+    }
+    
+    startPlacementMode(text);
+  };
+
+  // ===========================
+  // DRAW SIGN
+  // ===========================
+  const initDrawCanvas = () => {
+    const canvas = drawCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+    drawCtxRef.current = ctx;
+  };
+
+  const startDraw = (e) => {
+    setDrawing(true);
+    const rect = drawCanvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const ctx = drawCtxRef.current;
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+  };
+
+  const draw = (e) => {
+    if (!drawing) return;
+    const rect = drawCanvasRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const ctx = drawCtxRef.current;
+    ctx.lineTo(x, y);
+    ctx.stroke();
+  };
+
+  const stopDraw = () => setDrawing(false);
+
+  const clearDrawCanvas = () => {
+    const canvas = drawCanvasRef.current;
+    if (!canvas) return;
+    drawCtxRef.current.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const saveDrawSign = () => {
+    const canvas = drawCanvasRef.current;
+    const ctx = canvas.getContext("2d");
+    
+    // Get image data to find bounds of actual drawing
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const pixels = imageData.data;
+    
+    let minX = canvas.width;
+    let minY = canvas.height;
+    let maxX = 0;
+    let maxY = 0;
+    
+    // Find bounding box of drawn pixels
+    for (let y = 0; y < canvas.height; y++) {
+      for (let x = 0; x < canvas.width; x++) {
+        const index = (y * canvas.width + x) * 4;
+        const alpha = pixels[index + 3];
+        
+        if (alpha > 0) { // If pixel is not transparent
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    
+    // Add small padding
+    const padding = 10;
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(canvas.width, maxX + padding);
+    maxY = Math.min(canvas.height, maxY + padding);
+    
+    // Create cropped canvas
+    const croppedWidth = maxX - minX;
+    const croppedHeight = maxY - minY;
+    const croppedCanvas = document.createElement("canvas");
+    croppedCanvas.width = croppedWidth;
+    croppedCanvas.height = croppedHeight;
+    const croppedCtx = croppedCanvas.getContext("2d");
+    
+    // Draw cropped region
+    croppedCtx.drawImage(
+      canvas,
+      minX, minY, croppedWidth, croppedHeight,
+      0, 0, croppedWidth, croppedHeight
+    );
+    
+    const dataURL = croppedCanvas.toDataURL("image/png");
+    const newSign = { id: Date.now(), type: "drawn", imageData: dataURL };
+    const updated = [newSign, ...savedSigns].slice(0, 3);
+    saveSignsToLocal(updated);
+    setShowDrawModal(false);
+  };
+
+  const handleAddDrawnSign = (sign) => {
+    if (!fabricCanvases.length) return;
+    FabricImage.fromURL(sign.imageData).then((img) => {
+      img.scale(0.6); // 40% smaller for better proportions
+      startPlacementMode(img);
     });
-    startPlacementMode(sign);
   };
 
   const handleSave = async () => {
@@ -372,12 +510,70 @@ export default function PDFSignPage() {
         >
           📅 Add Date
         </button>
-        <button
-          className="toolbar-btn"
-          onClick={handleSignClick}
-        >
-          {signName ? `${signName} (Sign)` : "✍️ Add Sign"}
-        </button>
+
+        {/* SIGN DROPDOWN */}
+        <div className="sign-dropdown-wrapper">
+          <button
+            className="toolbar-btn"
+            onClick={() => setDropdownOpen(!dropdownOpen)}
+          >
+            ✍️ Sign ↓
+          </button>
+
+          {dropdownOpen && (
+            <div className="sign-dropdown-menu">
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  setShowFontModal(true);
+                  setDropdownOpen(false);
+                }}
+              >
+                ✍️ Create new sign
+              </button>
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  setShowDrawModal(true);
+                  setDropdownOpen(false);
+                  setTimeout(initDrawCanvas, 50);
+                }}
+              >
+                🖊️ Draw your sign
+              </button>
+              <div className="dropdown-divider" />
+              {savedSigns.length === 0 && (
+                <div className="dropdown-empty">
+                  No saved signs yet
+                </div>
+              )}
+              {savedSigns.map((sign) => (
+                <button
+                  key={sign.id}
+                  className="dropdown-item"
+                  onClick={() => {
+                    setDropdownOpen(false);
+                    if (sign.type === "font") handleAddFontSign(sign);
+                    else handleAddDrawnSign(sign);
+                  }}
+                >
+                  {sign.type === "font" ? (
+                    <span style={{ fontFamily: sign.fontFamily, fontStyle: "italic" }}>
+                      {sign.name}
+                    </span>
+                  ) : (
+                    <img
+                      src={sign.imageData}
+                      alt="Sign"
+                      className="dropdown-sign-thumb"
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         <button
           className="toolbar-btn toolbar-btn-success"
           onClick={handleSave}
@@ -400,8 +596,8 @@ export default function PDFSignPage() {
         className="pdf-container"
       ></div>
 
-      {/* Signature Modal */}
-      {showSignModal && (
+      {/* FONT SIGN MODAL */}
+      {showFontModal && (
         <div className="signature-modal-overlay">
           <div className="signature-modal">
             <h2 className="signature-modal-title">Create Signature</h2>
@@ -409,33 +605,82 @@ export default function PDFSignPage() {
               type="text"
               placeholder="Enter your name"
               className="signature-modal-input"
-              value={tempName}
-              onChange={(e) => setTempName(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && saveSignName()}
+              value={tempSignName}
+              onChange={(e) => setTempSignName(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSaveFontSign()}
             />
             <div className="signature-font-preview">
-              <div className="font-option font-serif">{tempName || "Preview"}</div>
-              <div className="font-option font-cursive">{tempName || "Preview"}</div>
-              <div className="font-option font-script">{tempName || "Preview"}</div>
-              <div className="font-option font-mono">{tempName || "Preview"}</div>
+              {["cursive", "serif", "monospace", "fantasy"].map((f) => (
+                <div
+                  key={f}
+                  className={`font-option ${activeFont === f ? "font-option-active" : ""}`}
+                  style={{ fontFamily: f }}
+                  onClick={() => setActiveFont(f)}
+                >
+                  {tempSignName || "Preview"}
+                </div>
+              ))}
             </div>
             <div className="signature-modal-actions">
               <button
                 className="btn-cancel"
                 onClick={() => {
-                  setShowSignModal(false);
-                  setTempName("");
+                  setShowFontModal(false);
+                  setTempSignName("");
                 }}
               >
                 Cancel
               </button>
               <button
                 className="btn-save"
-                onClick={saveSignName}
-                disabled={!tempName.trim()}
+                onClick={handleSaveFontSign}
+                disabled={!tempSignName.trim()}
               >
                 Save
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* DRAW SIGN MODAL */}
+      {showDrawModal && (
+        <div className="signature-modal-overlay">
+          <div className="signature-modal draw-modal">
+            <h2 className="signature-modal-title">Draw Your Signature</h2>
+            <canvas
+              ref={drawCanvasRef}
+              width={600}
+              height={250}
+              className="draw-canvas"
+              onMouseDown={startDraw}
+              onMouseMove={draw}
+              onMouseUp={stopDraw}
+              onMouseLeave={stopDraw}
+            ></canvas>
+            <div className="draw-modal-actions">
+              <div>
+                <button
+                  className="btn-cancel"
+                  onClick={clearDrawCanvas}
+                >
+                  Clear
+                </button>
+              </div>
+              <div className="signature-modal-actions">
+                <button
+                  className="btn-cancel"
+                  onClick={() => setShowDrawModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="btn-save"
+                  onClick={saveDrawSign}
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </div>
