@@ -7,6 +7,7 @@ import TemplatesPage from "./pages/TemplatesPage";
 import CreateTemplatePage from "./pages/CreateTemplatePage";
 import SignInPage from "./pages/SignInPage";
 import OnboardingPage from "./pages/OnboardingPage";
+import PDFSignPage from "./pages/PDFSignPage";
 import SplashScreen from "./components/SplashScreen";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ChipContainer from "./components/ChipContainer";
@@ -127,6 +128,11 @@ export default function App() {
           <Route path="/templates/edit/:id" element={
             <ProtectedRoute>
               <CreateTemplatePage />
+            </ProtectedRoute>
+          } />
+          <Route path="/pdfsign" element={
+            <ProtectedRoute>
+              <PDFSignPage />
             </ProtectedRoute>
           } />
           <Route path="/signin" element={<SignInPage />} />

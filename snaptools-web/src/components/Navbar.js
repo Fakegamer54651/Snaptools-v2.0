@@ -67,6 +67,13 @@ export default function Navbar() {
             <img src={DriversIcon} alt="" className="nav__icon" />
             Drivers
           </NavLink>
+          <NavLink 
+            to="/pdfsign" 
+            className={({ isActive }) => isActive ? 'nav__link active' : 'nav__link'}
+          >
+            <span className="material-symbols-rounded nav__icon" style={{ fontSize: '24px' }}>description</span>
+            PDF Sign
+          </NavLink>
         </div>
       </div>
 

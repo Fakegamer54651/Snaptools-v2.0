@@ -1,0 +1,51 @@
+/* PDF Sign Page Styles */
+.pdfsign-page {
+  padding: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.pdfsign-header {
+  margin-bottom: 32px;
+}
+
+.pdfsign-header h1 {
+  font-size: 28px;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+}
+
+.pdfsign-content {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  min-height: 500px;
+}
+
+/* Page wrapper - contains the combined PDF + Fabric canvas */
+.page-wrapper {
+  position: relative;
+  width: fit-content;
+  margin: 12px auto;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+
+/* Main canvas - PDF background with Fabric.js overlay */
+.pdf-canvas {
+  display: block;
+  cursor: default;
+}
+
+/* Fabric.js automatically adds these classes - ensure they work properly */
+.canvas-container {
+  margin: 0 !important;
+}
+
+.upper-canvas {
+  cursor: default !important;
+}
+
