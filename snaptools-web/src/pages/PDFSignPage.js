@@ -1,214 +1,192 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import * as pdfjsLib from "pdfjs-dist";
 import "pdfjs-dist/build/pdf.worker.mjs";
-import { Canvas, IText, FabricImage } from "fabric";
+import { Canvas, Textbox } from "fabric";
 import "./styles/pdfsign.css";
 
 export default function PDFSignPage() {
-  const [fileName, setFileName] = useState("");
-  const [pdfUrl, setPdfUrl] = useState(null);
-  const [numPages, setNumPages] = useState(0);
-  const [canvases, setCanvases] = useState([]);
-  const [activeTool, setActiveTool] = useState(null);
+  const fileInputRef = useRef(null);
   const containerRef = useRef(null);
+  const [fabricCanvases, setFabricCanvases] = useState([]);
 
-  useEffect(() => {
-    return () => {
-      if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    };
-  }, [pdfUrl]);
-
-  async function handleFileChange(e) {
+  const handleUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (pdfUrl) URL.revokeObjectURL(pdfUrl);
-    const url = URL.createObjectURL(file);
-    setFileName(file.name);
-    setPdfUrl(url);
-  }
 
-  useEffect(() => {
-    if (!pdfUrl) return;
-    renderPdf();
-  }, [pdfUrl]);
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
-  async function renderPdf() {
-    containerRef.current.innerHTML = "";
-    const pdf = await pdfjsLib.getDocument({ url: pdfUrl }).promise;
-    setNumPages(pdf.numPages);
+    containerRef.current.innerHTML = ""; // Reset container
+    const newFabricCanvases = [];
 
-    const tempCanvases = [];
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const viewport = page.getViewport({ scale: 1.5 });
 
-    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
-      const page = await pdf.getPage(pageNum);
-      const viewport = page.getViewport({ scale: 1.25 });
-      
-      // Step 1: Create a temporary canvas to render PDF
-      const tempCanvas = document.createElement("canvas");
-      const tempCtx = tempCanvas.getContext("2d");
-      tempCanvas.width = viewport.width;
-      tempCanvas.height = viewport.height;
-      
-      // Render PDF to temporary canvas
-      await page.render({ canvasContext: tempCtx, viewport }).promise;
-      
-      // Step 2: Create the main canvas for Fabric.js
-      const mainCanvas = document.createElement("canvas");
-      mainCanvas.classList.add("pdf-canvas");
-      mainCanvas.width = viewport.width;
-      mainCanvas.height = viewport.height;
-      
-      // Container wrapper for this page
+      // Create page wrapper
       const wrapper = document.createElement("div");
-      wrapper.classList.add("page-wrapper");
-      wrapper.appendChild(mainCanvas);
+      wrapper.className = "page-wrapper";
+
+      // Create and render PDF canvas (bottom layer)
+      const pdfCanvas = document.createElement("canvas");
+      pdfCanvas.className = "pdf-canvas";
+      pdfCanvas.width = viewport.width;
+      pdfCanvas.height = viewport.height;
+      wrapper.appendChild(pdfCanvas);
+
+      const ctx = pdfCanvas.getContext("2d");
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      // Create Fabric overlay canvas (top layer)
+      const fabricCanvas = document.createElement("canvas");
+      fabricCanvas.className = "fabric-canvas";
+      fabricCanvas.width = viewport.width;
+      fabricCanvas.height = viewport.height;
+      wrapper.appendChild(fabricCanvas);
+
       containerRef.current.appendChild(wrapper);
 
-      // Step 3: Initialize Fabric on the main canvas
-      const fabricCanvas = new Canvas(mainCanvas, {
+      // Initialize Fabric.js on the overlay canvas
+      const fCanvas = new Canvas(fabricCanvas, {
         selection: true,
         preserveObjectStacking: true,
-        renderOnAddRemove: true,
       });
 
-      // Step 4: Set the PDF as the background image using Fabric v6 API
-      const pdfDataUrl = tempCanvas.toDataURL("image/png");
-      const bgImage = await FabricImage.fromURL(pdfDataUrl);
-      fabricCanvas.set('backgroundImage', bgImage);
-      fabricCanvas.requestRenderAll();
-
-      // Delete on 'Delete' or 'Backspace' key
-      const keyHandler = (evt) => {
-        if (evt.key === "Delete" || evt.key === "Backspace") {
-          const activeObj = fabricCanvas.getActiveObject();
-          if (activeObj) fabricCanvas.remove(activeObj);
-        }
-      };
-      document.addEventListener("keydown", keyHandler);
-
-      tempCanvases.push(fabricCanvas);
+      newFabricCanvases.push(fCanvas);
     }
 
-    setCanvases(tempCanvases);
-  }
+    // Enable cross-page dragging
+    newFabricCanvases.forEach((fc, index) => {
+      fc.on("object:moving", (e) => {
+        const obj = e.target;
+        const bottomLimit = fc.height;
+        const topLimit = 0;
 
-  function handleTool(tool) {
-    setActiveTool(tool);
-    canvases.forEach((c) => {
-      c.discardActiveObject();
-      c.requestRenderAll();
+        // Moving down to next page
+        if (obj.top > bottomLimit && newFabricCanvases[index + 1]) {
+          fc.remove(obj);
+          obj.top = 10;
+          newFabricCanvases[index + 1].add(obj);
+          newFabricCanvases[index + 1].setActiveObject(obj);
+        }
+
+        // Moving up to previous page
+        if (obj.top < topLimit && newFabricCanvases[index - 1]) {
+          fc.remove(obj);
+          obj.top = newFabricCanvases[index - 1].height - 50;
+          newFabricCanvases[index - 1].add(obj);
+          newFabricCanvases[index - 1].setActiveObject(obj);
+        }
+      });
     });
 
-    if (!canvases.length) return;
-    const activeCanvas = canvases[0]; // apply to first page for MVP
-    let obj;
+    // Delete on 'Delete' or 'Backspace' key
+    const keyHandler = (evt) => {
+      if (evt.key === "Delete" || evt.key === "Backspace") {
+        newFabricCanvases.forEach((fc) => {
+          const activeObj = fc.getActiveObject();
+          if (activeObj) fc.remove(activeObj);
+        });
+      }
+    };
+    document.addEventListener("keydown", keyHandler);
 
-    const centerX = activeCanvas.getWidth() / 2;
-    const centerY = activeCanvas.getHeight() / 2;
+    setFabricCanvases(newFabricCanvases);
+  };
 
-    if (tool === "sign") {
-      obj = new IText("Sign Here", {
-        left: centerX - 50,
-        top: centerY - 10,
-        fontSize: 18,
-        fill: "#333",
-        fontFamily: "Arial",
-        selectable: true,
-      });
-    } else if (tool === "date") {
-      const today = new Date().toLocaleDateString();
-      obj = new IText(today, {
-        left: centerX - 40,
-        top: centerY - 10,
-        fontSize: 16,
-        fill: "#333",
-        fontFamily: "Arial",
-      });
-    } else if (tool === "text") {
-      obj = new IText("Enter text", {
-        left: centerX - 40,
-        top: centerY - 10,
-        fontSize: 16,
-        fill: "#333",
-        fontFamily: "Arial",
-      });
-    }
+  const addText = () => {
+    if (!fabricCanvases.length) return;
+    const activeCanvas = fabricCanvases[0];
+    const text = new Textbox("Enter text", {
+      left: activeCanvas.width / 2 - 50,
+      top: activeCanvas.height / 2,
+      fontSize: 20,
+      fill: "#000",
+      selectable: true,
+      fontFamily: "Arial",
+    });
+    activeCanvas.add(text);
+    activeCanvas.setActiveObject(text);
+    activeCanvas.requestRenderAll();
+  };
 
-    if (obj) {
-      activeCanvas.add(obj);
-      activeCanvas.setActiveObject(obj);
-      activeCanvas.requestRenderAll();
-    }
-  }
+  const addDate = () => {
+    if (!fabricCanvases.length) return;
+    const activeCanvas = fabricCanvases[0];
+    const today = new Date().toLocaleDateString();
+    const date = new Textbox(today, {
+      left: activeCanvas.width / 2 - 50,
+      top: activeCanvas.height / 2 + 40,
+      fontSize: 18,
+      fill: "#000",
+      selectable: true,
+      fontFamily: "Arial",
+    });
+    activeCanvas.add(date);
+    activeCanvas.setActiveObject(date);
+    activeCanvas.requestRenderAll();
+  };
+
+  const addSign = () => {
+    if (!fabricCanvases.length) return;
+    const activeCanvas = fabricCanvases[0];
+    const sign = new Textbox("✍️ Sign Here", {
+      left: activeCanvas.width / 2 - 60,
+      top: activeCanvas.height / 2 + 80,
+      fontSize: 22,
+      fill: "#000",
+      selectable: true,
+      fontStyle: "italic",
+      fontFamily: "Arial",
+    });
+    activeCanvas.add(sign);
+    activeCanvas.setActiveObject(sign);
+    activeCanvas.requestRenderAll();
+  };
 
   return (
-    <div style={{ padding: 24 }}>
-      <h1>PDF Sign Tool</h1>
-
-      <div style={{ marginBottom: 16 }}>
-        <label
-          htmlFor="pdf-input"
-          style={{
-            display: "inline-block",
-            padding: "8px 14px",
-            border: "1px solid #ccc",
-            borderRadius: 6,
-            cursor: "pointer",
-            marginRight: 12,
-          }}
-        >
-          Choose PDF
-        </label>
-        <input
-          id="pdf-input"
-          type="file"
-          accept="application/pdf"
-          onChange={handleFileChange}
-          style={{ display: "none" }}
-        />
-
+    <div className="pdf-sign-page">
+      {/* Sticky Toolbar */}
+      <div className="sticky-toolbar">
         <button
-          onClick={() => handleTool("sign")}
-          style={btnStyle(activeTool === "sign")}
+          className="toolbar-btn toolbar-btn-primary"
+          onClick={() => fileInputRef.current.click()}
         >
-          ✍️ Sign
+          📁 Upload PDF
         </button>
         <button
-          onClick={() => handleTool("date")}
-          style={btnStyle(activeTool === "date")}
+          className="toolbar-btn"
+          onClick={addText}
         >
-          📅 Date
+          🅣 Add Text
         </button>
         <button
-          onClick={() => handleTool("text")}
-          style={btnStyle(activeTool === "text")}
+          className="toolbar-btn"
+          onClick={addDate}
         >
-          🅣 Text
+          📅 Add Date
+        </button>
+        <button
+          className="toolbar-btn"
+          onClick={addSign}
+        >
+          ✍️ Add Sign
         </button>
       </div>
 
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="application/pdf"
+        onChange={handleUpload}
+        style={{ display: "none" }}
+      />
+
+      {/* PDF Container */}
       <div
         ref={containerRef}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "12px",
-          background: "#f7f7f7",
-          padding: "24px 0",
-        }}
+        className="pdf-container"
       ></div>
     </div>
   );
-}
-
-function btnStyle(active) {
-  return {
-    padding: "8px 12px",
-    marginRight: 8,
-    borderRadius: 6,
-    border: "1px solid #ccc",
-    background: active ? "#eee" : "white",
-    cursor: "pointer",
-  };
 }
