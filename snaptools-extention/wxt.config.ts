@@ -23,7 +23,8 @@ export default defineConfig({
       'https://outlook.office.com/*',
       'https://outlook.live.com/*',
       'https://*.dat.com/*',
-      'https://*.truckstop.com/*'
+      'https://*.truckstop.com/*',
+      'http://localhost:3001/*'
     ],
     default_locale: 'en',
     icons: {

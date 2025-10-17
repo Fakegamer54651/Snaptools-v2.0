@@ -286,10 +286,10 @@ function createModal(url: string | null): void {
     overflow: hidden;
   `;
 
-  // Create iframe for PDF viewer
+  // Create iframe for PDF viewer - loads SnapTools web app (embed version)
   const frame = document.createElement('iframe');
-  const pdfUrl = chrome.runtime.getURL(`pdf.html${url ? '?file=' + encodeURIComponent(url) : ''}`);
-  frame.src = pdfUrl;
+  const webAppUrl = `http://localhost:3001/pdfsign-embed${url ? '?pdf=' + encodeURIComponent(url) : ''}`;
+  frame.src = webAppUrl;
   frame.style.cssText = `
     width: 100%;
     height: 100%;
@@ -297,6 +297,7 @@ function createModal(url: string | null): void {
     background: #fff;
   `;
   frame.setAttribute('allow', 'fullscreen');
+  frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-downloads');
 
   modalContent.appendChild(frame);
   overlay.appendChild(modalContent);

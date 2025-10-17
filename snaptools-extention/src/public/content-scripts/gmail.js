@@ -297,14 +297,15 @@
       'overflow: hidden;';
     
     var frame = document.createElement('iframe');
-    var pdfUrl = chrome.runtime.getURL('pdf.html' + (url ? '?file=' + encodeURIComponent(url) : ''));
-    frame.src = pdfUrl;
+    var webAppUrl = 'http://localhost:3001/pdfsign-embed' + (url ? '?pdf=' + encodeURIComponent(url) : '');
+    frame.src = webAppUrl;
     frame.style.cssText =
       'width: 100%;' +
       'height: 100%;' +
       'border: none;' +
       'background: #fff;';
     frame.setAttribute('allow', 'fullscreen');
+    frame.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-forms allow-downloads');
     
     modalContent.appendChild(frame);
     overlay.appendChild(modalContent);

@@ -8,6 +8,7 @@ import CreateTemplatePage from "./pages/CreateTemplatePage";
 import SignInPage from "./pages/SignInPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import PDFSignPage from "./pages/PDFSignPage";
+import PDFSignEmbedPage from "./pages/PDFSignEmbedPage";
 import SplashScreen from "./components/SplashScreen";
 import LoadingOverlay from "./components/LoadingOverlay";
 import ChipContainer from "./components/ChipContainer";
@@ -34,7 +35,7 @@ export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(authStore.isAuthenticated());
 
   // Check if current page should hide navbar
-  const shouldHideNavbar = location.pathname === '/onboarding';
+  const shouldHideNavbar = location.pathname === '/onboarding' || location.pathname === '/pdfsign-embed';
 
   // Auto-dismiss splash screen after 1.5 seconds
   useEffect(() => {
@@ -96,15 +97,21 @@ export default function App() {
     removeChip
   };
 
+  // Don't show splash screen or UI feedback for embed mode
+  const isEmbedMode = location.pathname === '/pdfsign-embed';
+
   return (
     <UIContext.Provider value={uiValue}>
-      {/* Splash Screen */}
-      <SplashScreen isVisible={showSplash} />
+      {/* Splash Screen - Skip for embed mode */}
+      {!isEmbedMode && <SplashScreen isVisible={showSplash} />}
 
       {/* Main App Content */}
-      <div style={{ opacity: showSplash ? 0 : 1, transition: 'opacity 0.3s ease' }}>
+      <div style={{ opacity: (showSplash && !isEmbedMode) ? 0 : 1, transition: 'opacity 0.3s ease' }}>
         {isAuthenticated && !shouldHideNavbar && <Navbar />}
         <Routes>
+          {/* Embedded PDF Sign for Chrome Extension - No Auth Required */}
+          <Route path="/pdfsign-embed" element={<PDFSignEmbedPage />} />
+          
           <Route path="/" element={
             <ProtectedRoute>
               <TemplatesPage />
@@ -144,9 +151,13 @@ export default function App() {
         </Routes>
       </div>
 
-      {/* Global UI Feedback Components */}
-      <LoadingOverlay isVisible={globalLoading} />
-      <ChipContainer chips={chips} onDismiss={removeChip} />
+      {/* Global UI Feedback Components - Skip for embed mode */}
+      {!isEmbedMode && (
+        <>
+          <LoadingOverlay isVisible={globalLoading} />
+          <ChipContainer chips={chips} onDismiss={removeChip} />
+        </>
+      )}
     </UIContext.Provider>
   );
 }
